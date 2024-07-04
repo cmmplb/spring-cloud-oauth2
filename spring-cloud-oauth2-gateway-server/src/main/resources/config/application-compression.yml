@@ -1,0 +1,10 @@
+server:
+  compression:
+    # 是否开启压缩,默认为false,Spring Boot默认没有启用Http包压缩功能，但是压缩对减少带宽和加快页面加载非常有用。
+    enabled: true
+    # 指定不压缩的user-agent 多个以逗号分隔
+    excluded-user-agents: text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/json, application/xml
+    # 指定要压缩的mime-type,多个以逗号分隔.
+    mime-types: text/html, text/xml, text/plain, text/css, text/javascript, application/javascript, application/json, application/xml
+    # 执行压缩的阈值,默认为2048
+    min-response-size: 2048

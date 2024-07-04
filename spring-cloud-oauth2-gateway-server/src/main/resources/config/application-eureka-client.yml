@@ -1,0 +1,39 @@
+eureka:
+  instance:
+    # 执行当前服务的应用id，标识的是每一个具体的的服务(不可以重复)
+    instanceId: ${spring.application.name}@${spring.cloud.client.ip-address}@${server.port}
+    # 指定此实例的ip,防止其获取到内网ip无法调用
+    # https://www.cnblogs.com/moonandstar08/p/7571610.html
+    # 或者忽略指定网卡
+    ip-address: 127.0.0.1
+    # 当调用getHostname获取实例的hostname时，返回ip而不是host名称
+    prefer-ip-address: true
+    # 每隔5s发送一次心跳, 默认30秒
+    lease-renewal-interval-in-seconds: 5
+    # 告知服务端未xx秒内收到心跳，就将该服务移除列表，即xx秒未续约的服务实例, 参考server的缓存机制, 默认90秒
+    lease-expiration-duration-in-seconds: 30
+    # 状态页面路径
+    status-page-url-path: /actuator/info
+    # 健康检查路径
+    health-check-url-path: /actuator/health
+    # defaultZone无法解析pom文件@variable@, 自定义一个变量做映射
+    port: @eureka.server.port@
+
+  client:
+    enabled: true
+    # 配置中的  defaultZone 必须是 驼峰格式，不能写成 default-zone，否则，无效。因为，eureka.client.service-url 是一个 Map类型。
+    service-url:
+      # 单机配置, defaultZone无法解析pom文件@variable@, 自定义一个变量做映射
+      defaultZone: http://localhost:${eureka.instance.port}/eureka
+    # 健康检查, 默认开启, 依赖于 spring-boot-starter-actuator, 如果要开启的话就需要添加这个依赖
+    healthcheck.enabled: false
+    # 是否需要将自己注册给自己的注册中心-默认true
+    register-with-eureka: true
+    # 是否检索注册中心的服务-默认true
+    fetch-registry: true
+    # eureka client间隔多久去拉取服务器注册信息,默认为30秒
+    registry-fetch-interval-seconds: 30
+    # 表示要复制的实例更改的频率(以秒为单位)  默认30
+    # InstanceInfoReplicator     : Ignoring onDemand update due to rate limiter
+    # this.allowedRatePerMinute = 60 * this.burstSize / this.replicationIntervalSeconds;
+    instance-info-replication-interval-seconds: 30

@@ -1,0 +1,14 @@
+# 暴露端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+  endpoint:
+    health:
+      show-details: always
+
+    # 可以关闭制定的端点
+    shutdown:
+      enabled: false

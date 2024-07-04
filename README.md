@@ -1,37 +1,37 @@
-# spring-cloud-oauth2
+# 学习oauth2
 
-#### 介绍
-学习oauth2
+本项目偏向于项目使用，基础版的话网上都很多。 （idea开发，需要安装lombok插件）
+配合使用Element Plus + Vue3
 
-#### 软件架构
-软件架构说明
+版本：
 
+| 依赖                                   | 版本             |
+|--------------------------------------|----------------|
+| SpringBoot                           | 2.5.3          |
+| SpringCloud                          | 2020.0.4       |
+| SpringSecurity                       | 3.2.10.RELEASE |
+| SpringSecurity                       | 3.2.10.RELEASE |
+| spring-security-oauth2-autoconfigure | 2.1.2.RELEASE  |
+| jdk                                  | 1.8            |
 
-#### 安装教程
+仓库地址：https://gitee.com/cmmplb/spring-cloud-oauth2
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+doc目录添加了步骤文档。
 
-#### 使用说明
+````
+spring-cloud-oauth2
+├── doc                                                 文档
+├── spring-cloud-oauth2-auth-server                     授权服务器 [20000]
+├── spring-cloud-oauth2-eureka-server                   注册中心 [8761]
+├── spring-cloud-oauth2-gateway                         网关服务 [10000]
+├── spring-cloud-oauth2-resource-server                 资源服务    
+├── spring-cloud-oauth2-system-server                   系统模块 [30000]
+├── spring-cloud-oauth2-ui:                             前端框架 [18080]
+├──pom.xml                                              父工程依赖
+````
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+学习参考地址:
 
-#### 参与贡献
+`https://gitee.com/copoile/springcloud-oauth2`
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+`https://blog.csdn.net/qq15035899256/article/details/129541483`

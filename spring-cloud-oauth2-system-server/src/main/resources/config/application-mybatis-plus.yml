@@ -1,0 +1,10 @@
+mybatis-plus:
+  # xml文件扫描路径
+  mapper-locations:
+    - classpath:/mapper/*.xml
+  global-config:
+    # 不显示banner图到控制台
+    banner: false
+  configuration:
+    #打印sql日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

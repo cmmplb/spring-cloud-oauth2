@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cmmplb.oauth2.system.server.dao.UserMapper">
+
+    <select id="selectRoleCodesById" resultType="java.lang.String">
+        select sr.`code`
+        from `sys_user_role` sur
+        left join `sys_role` sr on sur.`role_id` = sr.`id`
+        where sur.`user_id` = #{id}
+    </select>
+
+    <select id="selectPermissionCodesByRoleCodes" resultType="java.lang.String">
+        select sp.`code`
+        from `sys_role_permission` srp
+        left join `sys_permission` sp on srp.`permission_id` = sp.`id`
+        and srp.`role_id` in
+        <foreach collection="roleCodes" item="roleCode" open="(" separator="," close=")">
+            #{roleCode}
+        </foreach>
+    </select>
+</mapper>

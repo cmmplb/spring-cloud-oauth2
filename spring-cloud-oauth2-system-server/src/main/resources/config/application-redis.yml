@@ -1,0 +1,19 @@
+spring:
+  redis:
+    # 数据库索引, 默认0
+    database: 0
+    # 主机地址, 默认localhost
+    host: @redis.host@
+    # 密码
+    password: @redis.password@
+    # 服务器端口, 默认6379
+    port: @redis.port@
+    # 超时时间
+    timeout: 10000
+    # 连接池配置
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: 1000

@@ -1,0 +1,49 @@
+# gateway配置详解：https://www.cnblogs.com/crazymakercircle/p/11704077.html
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        # 连接超时以毫秒为单位, 默认值为45秒
+        connect-timeout: 5000
+        # 响应超时, Duration类型
+        response-timeout: 1000s
+      discovery:
+        locator:
+          # 开启自动路由, 创建默认的路由规则, 以服务名开头的请求路径转发到对应的服务, 如果配置文件中添加了其他规则，则两个规则会同时存在，并且都会生效。
+          enabled: true
+          # 使用小写服务名, 在eureka上服务名都是大写了, 默认false
+          lower-case-service-id: true
+      # 路由配置
+      routes:
+        # ========================授权服务器========================
+        - id: auth-server
+          # 转发到授权服务器, 配置了负载均衡，加上lb了前缀, 后面是授权服务器的服务名称
+          uri: lb://spring-cloud-oauth2-auth-server
+          # 路由断言
+          predicates:
+            - Path=/auth/**
+          # 过滤配置, 例如 /auth/login 的请求时，StripPrefix=1 将会去除 /auth 前缀，将最终的请求路径转发到 http://xxx/login。
+          filters:
+            - StripPrefix=1
+
+        # ========================系统模块========================
+        - id: system-server
+          uri: lb://spring-cloud-oauth2-system-server
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1
+
+      # gateway的全局跨域请求配置
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedHeaders: "*"
+            # 报错：When allowCredentials is true, allowedOrigins cannot contain the special value "*" since that cannot
+            # be set on the "Access-Control-Allow-Origin" response header. To allow credentials to a set of origins, list them explicitly or consider using
+            # allowedOrigins: "*"
+            allowedOriginPatterns: "*"
+            allowCredentials: true
+            allowedMethods: "*"
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials Vary, RETAIN_UNIQUE

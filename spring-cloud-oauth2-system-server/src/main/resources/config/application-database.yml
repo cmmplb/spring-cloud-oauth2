@@ -1,0 +1,17 @@
+spring:
+  #数据源配置
+  datasource:
+    username: @mysql.username@
+    password: @mysql.password@
+    url: jdbc:mysql://@mysql.url@?autoReconnect=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      pool-name: appHikariCP
+      minimum-idle: 5
+      maximum-pool-size: 10
+      idle-timeout: 180000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      auto-commit: true
+      connection-test-query: SELECT 1

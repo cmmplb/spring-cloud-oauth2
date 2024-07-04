@@ -1,0 +1,15 @@
+server:
+  # 服务端口, 引用pom文件变量
+  port: @eureka.server.port@
+  servlet:
+    # 路径
+    context-path: /
+
+spring:
+  application:
+    # 应用程序名称
+    name: @project.artifactId@
+  profiles:
+    # 引用配置文件
+    include:
+      - eureka-server
