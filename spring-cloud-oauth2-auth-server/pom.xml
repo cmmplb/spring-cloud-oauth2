@@ -17,7 +17,7 @@
     <!-- 项目名称 -->
     <name>${project.artifactId}</name>
     <!-- 描述信息 -->
-    <description>授权服务器</description>
+    <description>认证服务器</description>
 
     <!-- 依赖 -->
     <dependencies>
@@ -25,6 +25,11 @@
         <dependency>
             <groupId>com.cmmplb</groupId>
             <artifactId>spring-cloud-oauth2-resource-server</artifactId>
+        </dependency>
+        <!-- thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <!-- web启动器 -->
         <dependency>

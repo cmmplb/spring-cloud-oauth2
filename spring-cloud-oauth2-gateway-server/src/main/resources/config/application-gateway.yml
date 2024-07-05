@@ -15,9 +15,9 @@ spring:
           lower-case-service-id: true
       # 路由配置
       routes:
-        # ========================授权服务器========================
+        # ========================认证服务器========================
         - id: auth-server
-          # 转发到授权服务器, 配置了负载均衡，加上lb了前缀, 后面是授权服务器的服务名称
+          # 转发到认证服务器, 配置了负载均衡，加上lb了前缀, 后面是认证服务器的服务名称
           uri: lb://spring-cloud-oauth2-auth-server
           # 路由断言
           predicates:
@@ -25,7 +25,13 @@ spring:
           # 过滤配置, 例如 /auth/login 的请求时，StripPrefix=1 将会去除 /auth 前缀，将最终的请求路径转发到 http://xxx/login。
           filters:
             - StripPrefix=1
-
+        # 认证服务其他资源转发
+        - id: resource-server
+          uri: lb://spring-cloud-oauth2-auth-server
+          # 路由断言
+          predicates:
+            # css静态资源也可以在导入文件前加上服务名/auth/css/bootstrap.min.css，但那样的话只能通过网关请求，服务请求的话因为多了服务名会404，看自己按需配置吧
+            - Path=/login,/css/signin.css,/css/bootstrap.min.css,/css/bootstrap.min.css.map
         # ========================系统模块========================
         - id: system-server
           uri: lb://spring-cloud-oauth2-system-server

@@ -21,7 +21,7 @@ doc目录添加了步骤文档。
 ````
 spring-cloud-oauth2
 ├── doc                                                 文档
-├── spring-cloud-oauth2-auth-server                     授权服务器 [20000]
+├── spring-cloud-oauth2-auth-server                     认证服务器 [20000]
 ├── spring-cloud-oauth2-eureka-server                   注册中心 [8761]
 ├── spring-cloud-oauth2-gateway                         网关服务 [10000]
 ├── spring-cloud-oauth2-resource-server                 资源服务    
