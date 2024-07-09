@@ -1,19 +1,6 @@
-<script setup lang="ts">
-import {onMounted} from 'vue';
-import axios from 'axios';
-
-onMounted(() => {
-    axios.get('/api/system/actuator/health').then(res => {
-        console.log('system:', res);
-    });
-    axios.get('/api/auth/actuator/health').then(res => {
-        console.log('auth:', res);
-    });
-});
-</script>
-
 <template>
-    <div>
-        <h1>Home</h1>
-    </div>
+  <div id="app">
+    <!-- 设置挂载点-当url的hash值路径切换, 显示规则里对应的组件到这 -->
+    <router-view/>
+  </div>
 </template>

@@ -11,11 +11,15 @@
   "dependencies": {
     "axios": "^1.7.2",
     "element-plus": "^2.7.6",
-    "vue": "^3.4.29"
+    "vue": "^3.4.29",
+    "vue-router": "^4.4.0",
+    "vue3-json-viewer": "^2.2.2"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",
     "@vitejs/plugin-vue": "^5.0.5",
+    "sass": "^1.77.6",
+    "sass-loader": "^14.2.1",
     "typescript": "^5.2.2",
     "vite": "^5.3.1",
     "vue-tsc": "^2.0.21"

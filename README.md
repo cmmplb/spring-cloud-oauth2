@@ -30,6 +30,14 @@ spring-cloud-oauth2
 ├──pom.xml                                              父工程依赖
 ````
 
+防止每个功能代码迭代替换了前面步骤的代码，所以每个功能模块的代码都放在了单独的分支上，按照doc目录下的序号打的分支。
+
+````
+feature
+├── 2.1         认证服务四种模式
+├── 2.2         认证服务四种模式-前端代码
+````
+
 学习参考地址:
 
 `https://gitee.com/copoile/springcloud-oauth2`

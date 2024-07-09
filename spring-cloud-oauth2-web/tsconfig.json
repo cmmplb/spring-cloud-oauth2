@@ -1,10 +1,13 @@
 {
   "files": [],
+  // 使用vite创建vue3项目中会自动生成三个tsconfig相关的文件
   "references": [
     {
+      // 用来定义项目中其他文件的 ts 编译规则
       "path": "./tsconfig.app.json"
     },
     {
+      // 用来配置 vite.config.ts 文件的编译规则
       "path": "./tsconfig.node.json"
     }
   ]
