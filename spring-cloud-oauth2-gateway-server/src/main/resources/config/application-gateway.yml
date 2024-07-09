@@ -31,7 +31,7 @@ spring:
           # 路由断言
           predicates:
             # css静态资源也可以在导入文件前加上服务名/auth/css/bootstrap.min.css，但那样的话只能通过网关请求，服务请求的话因为多了服务名会404，看自己按需配置吧
-            - Path=/login,/css/signin.css,/css/bootstrap.min.css,/css/bootstrap.min.css.map
+            - Path=/login,/oauth/authorize,/css/signin.css,/css/bootstrap.min.css,/css/bootstrap.min.css.map
         # ========================系统模块========================
         - id: system-server
           uri: lb://spring-cloud-oauth2-system-server
