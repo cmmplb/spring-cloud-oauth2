@@ -21,11 +21,6 @@
 
     <!-- 依赖 -->
     <dependencies>
-        <!-- security-oauth2 -->
-        <dependency>
-            <groupId>org.springframework.security.oauth.boot</groupId>
-            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
-        </dependency>
         <!-- redis -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

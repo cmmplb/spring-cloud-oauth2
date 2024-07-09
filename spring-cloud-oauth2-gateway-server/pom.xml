@@ -17,7 +17,7 @@
     <!-- 项目名称 -->
     <name>${project.artifactId}</name>
     <!-- 描述信息 -->
-    <description>网关模块</description>
+    <description>网关服务模块</description>
 
     <!-- 依赖 -->
     <dependencies>

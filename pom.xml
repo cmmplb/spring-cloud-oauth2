@@ -17,15 +17,6 @@
     <!-- 描述信息 -->
     <description>服务注册中心</description>
 
-    <!-- 子模块 -->
-    <modules>
-        <module>spring-cloud-oauth2-auth-server</module>
-        <module>spring-cloud-oauth2-eureka-server</module>
-        <module>spring-cloud-oauth2-gateway-server</module>
-        <module>spring-cloud-oauth2-resource-server</module>
-        <module>spring-cloud-oauth2-system-server</module>
-    </modules>
-
     <!-- 版本依赖定义 -->
     <properties>
         <!-- 版本依赖 -->
