@@ -62,7 +62,7 @@ import type {TabsPaneContext} from 'element-plus';
 import {ElMessage} from 'element-plus';
 
 // 当前激活的tab页签
-const activeName = ref('authorization_code');
+const activeName = ref('client_credentials');
 
 // 响应结果对象，注意json-viewer渲染的是一个对象，而不是json字符串
 const responseObj = ref();

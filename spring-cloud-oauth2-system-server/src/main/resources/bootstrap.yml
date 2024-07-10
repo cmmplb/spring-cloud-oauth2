@@ -17,4 +17,4 @@ spring:
       - management
       - mybatis-plus
       - redis
-      - security_oauth2
+#      - security_oauth2
