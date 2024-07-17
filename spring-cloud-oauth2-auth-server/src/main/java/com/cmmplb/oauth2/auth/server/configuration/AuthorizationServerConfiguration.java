@@ -1,5 +1,6 @@
 package com.cmmplb.oauth2.auth.server.configuration;
 
+import com.cmmplb.oauth2.resource.server.handler.GlobalWebResponseExceptionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
 /**
  * @author penglibo
@@ -31,6 +33,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private TokenStore tokenStore;
+
+    @Autowired
+    private GlobalWebResponseExceptionTranslator globalWebResponseExceptionTranslator;
+
     /**
      * 配置授权服务器端点的非安全功能，如令牌存储、令牌自定义、用户批准和授权类型。
      * 默认情况下你不需要做任何事情，除非你需要密码授权，在这种情况下你需要提供一个 {@link AuthenticationManager}。 *
@@ -44,7 +52,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 // 用户信息服务
                 .userDetailsService(userDetailsService)
                 // 配置认证管理器
-                .authenticationManager(authenticationManager);
+                .authenticationManager(authenticationManager)
+                // 配置token存储
+                .tokenStore(tokenStore)
+                // 自定义异常处理
+                .exceptionTranslator(globalWebResponseExceptionTranslator)
+        ;
     }
 
     /**
