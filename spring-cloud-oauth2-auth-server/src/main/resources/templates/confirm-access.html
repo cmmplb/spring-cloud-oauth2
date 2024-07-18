@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>spring-cloud-oauth2服务授权</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+      }
+
+      html {
+          height: 100%;
+      }
+
+      body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          color: #333;
+          min-width: 1240px;
+          font: 1em/1.4 'Microsoft Yahei', 'PingFang SC', 'Avenir', 'Segoe UI', 'Hiragino Sans GB', 'STHeiti', 'Microsoft Sans Serif', 'WenQuanYi Micro Hei', sans-serif
+      }
+
+      ul,
+      h1,
+      h3,
+      h4,
+      p,
+      span,
+      dl,
+      dd {
+          padding: 0;
+          margin: 0;
+      }
+
+      a {
+          text-decoration: none;
+      }
+
+      .container {
+          height: 100%;
+      }
+
+      .confirm-wrapper {
+          /* 添加盒子阴影 */
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+          background-color: #fff;
+          width: 358px;
+          height: 548px;
+          border-radius: 15px;
+          padding: 0 50px;
+          position: relative;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+      }
+
+      .header {
+          font-size: 38px;
+          font-weight: bold;
+          text-align: center;
+          line-height: 200px;
+      }
+
+      .box {
+          margin-top: -30px;
+      }
+
+      .title {
+          font-size: 18px;
+      }
+
+      .information-content {
+          margin-top: 10px;
+      }
+
+      .all-check {
+          margin-bottom: 10px;
+      }
+
+      .agreement-content {
+          margin-top: 20px;
+      }
+
+      .btn {
+          margin-top: 20px;
+          width: 100%;
+          height: 40px;
+          border: 1px solid rgb(128, 125, 125);
+          border-radius: 10px;
+          color: #000000;
+          background-image: linear-gradient(rgba(194, 251, 234, 0.78), rgba(194, 246, 251, 0.76));
+      }
+
+      .submit-btn:hover {
+          background-color: #1E90FF;
+          cursor: pointer;
+      }
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="confirm-wrapper">
+    <div class="header">服务授权</div>
+
+    <div class="box">
+      <p class="title" th:text="${clientId}+'将获取以下权限'"></p>
+
+      <form id="confirmationForm" name="confirmationForm" action="/oauth/authorize" method="post">
+        <input name="user_oauth_approval" value="true" type="hidden"/>
+        <div class="information-content" th:if="${scopes.size() > 0}">
+          <div class="all-check">
+            <label>
+              <input id="allCheck" type="checkbox" onclick="checkAll()" checked="checked">
+              <span>全选</span>
+            </label>
+          </div>
+          <!-- Stat是状态变量，有 index,count,size,current,even,odd,first,last等属性，如果没有显示设置状态变量，thymeleaf会默 认给个“变量名+Stat"的状态变量。 -->
+          <div th:each="scope,stat : ${scopes}" class="ckboxs">
+            <label>
+              <input type="checkbox" th:name="'scope.' + ${scope.getKey()}" onclick="checkOne()" value="true"
+                     checked="checked">
+            </label>
+            <span th:text="${scope.getValue()}"></span>
+          </div>
+        </div>
+        <div class="agreement-content">
+          授权即同意<a href="#">oauth2服务协议</a>和<a href="#">隐私保护指引</a>
+        </div>
+        <div class="btn-content">
+          <button class="btn submit-btn" name="authorize" value="Authorize" type="submit">
+            同意授权
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+<script>
+  // 全选、全不选事件
+  function checkAll() {
+    let allCheck = document.getElementById('allCheck');
+    let chBox = document.querySelectorAll('.ckboxs input');
+    let len = chBox.length;
+    for (let i = 0; i < len; i++) {
+      // 当全选按钮为true，全部按钮都为true，否则相反
+      chBox[i].checked = !!allCheck.checked;
+    }
+  }
+
+  // 单选事件，有一个不选，则取消全选
+  function checkOne() {
+    let count = 0;
+    let chBox = document.querySelectorAll('.ckboxs input');
+    let len = chBox.length;
+    for (let i = 0; i < len; i++) {
+      // 记录单选按钮为true的数量
+      if (chBox[i].checked) {
+        count++;
+      }
+    }
+    //当单选按钮都为true时，全选按钮也为true，否则为false
+    document.getElementById('allCheck').checked = count === len;
+  }
+</script>
+</html>

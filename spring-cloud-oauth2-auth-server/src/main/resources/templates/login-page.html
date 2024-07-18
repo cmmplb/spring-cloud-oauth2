@@ -1,35 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>Please sign in</title>
-    <!-- 网络不通的情况，无法获取到css样式，还得翻墙，单独把这个文件下载了 -->
-    <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">-->
-    <!--<link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>-->
-    <!-- css静态资源也可以在导入文件前加上服务名/auth/css/bootstrap.min.css，但那样的话只能通过网关请求，服务请求的话因为多了服务名会404，看自己按需配置吧 -->
-    <link href="/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-    <link href="/css/signin.css" rel="stylesheet" crossorigin="anonymous"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+      }
+
+      html {
+          height: 100%;
+      }
+
+      body {
+          height: 100%;
+      }
+
+      .container {
+          height: 100%;
+      }
+
+      .login-wrapper {
+          /* 添加盒子阴影 */
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+          background-color: #fff;
+          width: 358px;
+          height: 548px;
+          border-radius: 15px;
+          padding: 0 50px;
+          position: relative;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+      }
+
+      .header {
+          font-size: 38px;
+          font-weight: bold;
+          text-align: center;
+          line-height: 200px;
+      }
+
+      .input-item {
+          display: block;
+          width: 100%;
+          margin-bottom: 20px;
+          border: 0;
+          padding: 10px 0;
+          border-bottom: 1px solid rgb(128, 125, 125);
+          font-size: 15px;
+          outline: none;
+      }
+
+      .btn {
+          margin-top: 40px;
+          padding: 10px;
+          text-align: center;
+          width: 100%;
+          height: 40px;
+          border: 1px solid rgb(128, 125, 125);
+          border-radius: 10px;
+          background-image: linear-gradient(rgba(194, 251, 234, 0.78), rgba(194, 246, 251, 0.76));
+          color: #000000;
+      }
+
+      .btn:hover {
+          background-image: linear-gradient(to right, #a6c1ee, #cfd2d6);
+          cursor: pointer;
+      }
+
+      a {
+          text-decoration-line: none;
+          color: #abc1ee;
+      }
+
+      /* 去掉填充后的背景色 */
+      input:-webkit-autofill {
+          background: transparent;
+          transition: background-color 50000s ease-in-out 0s;
+          -webkit-text-fill-color: unset;
+      }
+  </style>
 </head>
 <body>
 <div class="container">
+  <div class="login-wrapper">
     <!-- /login请求路径，如果通过网关的话，需要网关添加转发，也可以在路径前添加服务名/auth/login，不过后者单独请求认证服务的话就会404 -->
-    <form class="form-signin" method="post" action="/login">
-        <h2 class="form-signin-heading">Please sign in</h2>
+    <form method="post" action="/login">
+      <div class="header">Please sign in</div>
+      <div class="form-wrapper">
         <p>
-            <label for="username" class="sr-only">Username</label>
-            <input type="text" id="username" name="username" class="form-control" placeholder="Username" required
-                   autofocus>
+          <label for="username"></label>
+          <input type="text" id="username" name="username" placeholder="username" class="input-item">
         </p>
         <p>
-            <label for="password" class="sr-only">Password</label>
-            <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+          <label for="password"></label>
+          <input type="password" id="password" name="password" placeholder="password" class="input-item">
         </p>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <button class="btn" type="submit">Login</button>
+      </div>
     </form>
+  </div>
 </div>
 </body>
 </html>

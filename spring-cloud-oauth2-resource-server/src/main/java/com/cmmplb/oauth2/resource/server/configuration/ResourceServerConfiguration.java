@@ -1,11 +1,12 @@
 package com.cmmplb.oauth2.resource.server.configuration;
 
+import com.cmmplb.oauth2.resource.server.handler.AccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.RemoteTokenServices;import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenStore;
 
 /**
  * @author penglibo
@@ -14,7 +15,6 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;im
  * 资源服务器配置
  */
 
-@Configuration
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
@@ -24,11 +24,16 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Autowired
     private TokenStore tokenStore;
 
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;
+
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
         // token存取
         resources.tokenStore(tokenStore);
         // 通过这个Bean，去远程调用认证服务器，验token
         resources.tokenServices(remoteTokenServices);
+        // 权限不足处理
+        resources.accessDeniedHandler(accessDeniedHandler);
     }
 }

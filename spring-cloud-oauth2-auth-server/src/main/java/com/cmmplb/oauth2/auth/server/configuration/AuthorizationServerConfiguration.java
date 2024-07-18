@@ -57,6 +57,11 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .tokenStore(tokenStore)
                 // 自定义异常处理
                 .exceptionTranslator(globalWebResponseExceptionTranslator)
+                // 替换默认的授权页面地址，参数1是默认地址，参数2是自定义地址
+                .pathMapping("/oauth/confirm_access", "/oauth/confirm/access")
+                // 替换默认的错误页面地址
+                .pathMapping("/oauth/error", "/oauth/error")
+
         ;
     }
 
@@ -88,7 +93,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .secret(passwordEncoder.encode("123456"))
                 // 自动同意，为false登录后会跳转到授权页面
                 .autoApprove(false)
-                .scopes("all")
+                .scopes("username", "phone", "age")
                 // 登录成功回调地址，这里如果配置了多个，则请求地址需要携带redirect_uri参数，并且值是配置的其中一个，如果只配置一个，则可以不带redirect_uri参数
                 .redirectUris("http://localhost:10000/auth/actuator/health", "http://localhost:20000/actuator/health", "http://localhost:18080/auth")
                 .authorizedGrantTypes("client_credentials", "password", "implicit", "authorization_code", "refresh_token")

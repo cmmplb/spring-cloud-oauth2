@@ -11,8 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.savedrequest.CookieRequestCache;
-import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -41,9 +39,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
                 .and()
                 .authorizeRequests()
                 // 放行登录页面引用的css
-                .antMatchers("/css/**"
-                        // , "/favicon.ico"
-                ).permitAll()
+                .antMatchers("/css/**").permitAll()
                 .anyRequest().authenticated()
                 // 关闭跨域保护
                 .and().csrf().disable();
