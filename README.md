@@ -1,7 +1,6 @@
 # 学习oauth2
 
-本项目偏向于项目使用，基础版的话网上都很多。 （idea开发，需要安装lombok插件）
-配合使用Element Plus + Vue3
+配合使用Element Plus + Vue3（idea开发，需要安装lombok插件）
 
 版本：
 
