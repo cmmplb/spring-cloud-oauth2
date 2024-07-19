@@ -11,7 +11,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+
+import javax.sql.DataSource;
 
 /**
  * @author penglibo
@@ -39,6 +42,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     @Autowired
     private GlobalWebResponseExceptionTranslator globalWebResponseExceptionTranslator;
 
+    @Autowired
+    private DataSource dataSource;
+
     /**
      * 配置授权服务器端点的非安全功能，如令牌存储、令牌自定义、用户批准和授权类型。
      * 默认情况下你不需要做任何事情，除非你需要密码授权，在这种情况下你需要提供一个 {@link AuthenticationManager}。 *
@@ -61,7 +67,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .pathMapping("/oauth/confirm_access", "/oauth/confirm/access")
                 // 替换默认的错误页面地址
                 .pathMapping("/oauth/error", "/oauth/error")
-
         ;
     }
 
@@ -84,6 +89,23 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+        // 基于数据库配置
+        jdbc(clients);
+        // 基于内存配置
+        // inMemory(clients);
+    }
+
+    /**
+     * 基于数据库配置客户端信息
+     */
+    private void jdbc(ClientDetailsServiceConfigurer clients) throws Exception {
+        clients.jdbc(dataSource);
+    }
+
+    /**
+     * 基于内存配置客户端信息
+     */
+    private void inMemory(ClientDetailsServiceConfigurer clients) throws Exception {
         clients
                 // 基于内存配置
                 .inMemory()
@@ -96,7 +118,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .scopes("username", "phone", "age")
                 // 登录成功回调地址，这里如果配置了多个，则请求地址需要携带redirect_uri参数，并且值是配置的其中一个，如果只配置一个，则可以不带redirect_uri参数
                 .redirectUris("http://localhost:10000/auth/actuator/health", "http://localhost:20000/actuator/health", "http://localhost:18080/auth")
-                .authorizedGrantTypes("client_credentials", "password", "implicit", "authorization_code", "refresh_token")
-        ;
+                .authorizedGrantTypes("client_credentials", "password", "implicit", "authorization_code", "refresh_token");
     }
 }

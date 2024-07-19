@@ -6,11 +6,11 @@
 
 | 依赖                                   | 版本             |
 |--------------------------------------|----------------|
-| SpringBoot                           | 2.5.3          |
-| SpringCloud                          | 2020.0.4       |
-| SpringSecurity                       | 3.2.10.RELEASE |
-| SpringSecurity                       | 3.2.10.RELEASE |
+| spring-boot                          | 2.5.3          |
+| spring-cloud                         | 2020.0.4       |
+| spring-security                      | 3.2.10.RELEASE |
 | spring-security-oauth2-autoconfigure | 2.1.2.RELEASE  |
+| mybatis-plus                         | 3.4.3.1        |
 | jdk                                  | 1.8            |
 
 仓库地址：https://gitee.com/cmmplb/spring-cloud-oauth2

@@ -31,15 +31,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return getUserInfoVO(user);
     }
 
-    @Override
-    public UserInfoVO getByMobile(String mobile) {
-        User user = baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, mobile));
-        if (null == user) {
-            throw new RuntimeException("用户信息不存在");
-        }
-        return getUserInfoVO(user);
-    }
-
     private UserInfoVO getUserInfoVO(User user) {
         UserInfoVO userInfoVO = new UserInfoVO();
         UserInfoVO.UserVO userVO = new UserInfoVO.UserVO();
@@ -56,4 +47,3 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userInfoVO;
     }
 }
-

@@ -1,5 +1,8 @@
 package com.cmmplb.oauth2.auth.server.configuration;
 
+import com.cmmplb.oauth2.resource.server.utils.MD5Util;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -9,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -21,10 +23,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Security安全配置
  */
 
+@Slf4j
 @Order(1)
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -53,6 +59,13 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // 自定义用户信息验证
+        auth.userDetailsService(userDetailsService);
+        // 基于内存中的身份验证
+        // inMemoryAuthentication(auth);
+    }
+
+    private void inMemoryAuthentication(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 // 基于内存中的身份验证
                 .inMemoryAuthentication()
@@ -70,11 +83,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
                 .roles("USER");
     }
 
-    @Bean
-    @Override
-    public UserDetailsService userDetailsServiceBean() throws Exception {
-        return super.userDetailsServiceBean();
-    }
+    // @Bean
+    // @Override
+    // public UserDetailsService userDetailsServiceBean() throws Exception {
+    //     return super.userDetailsServiceBean();
+    // }
 
     @Bean
     @Override
@@ -84,6 +97,27 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
+        // 自定义MD5加密方式
+        return new PasswordEncoder() {
+
+            /**
+             * MD5加密
+             */
+            @Override
+            public String encode(CharSequence rawPassword) {
+                log.info("加密：{}", rawPassword);
+                return MD5Util.encode(String.valueOf(rawPassword));
+            }
+
+            /**
+             * 匹配密码，rawPassword为输入的，encodedPassword数据库查出来的
+             */
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                log.info("解密：{},{}", rawPassword, encodedPassword);
+                return encodedPassword.equals(MD5Util.encode(String.valueOf(rawPassword)));
+            }
+        };
+        // return new BCryptPasswordEncoder(10);
     }
 }

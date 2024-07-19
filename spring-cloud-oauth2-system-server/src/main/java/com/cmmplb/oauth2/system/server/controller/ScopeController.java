@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("/info")
-public class InfoController {
+@RequestMapping("/scope")
+public class ScopeController {
 
     @PreAuthorize("#oauth2.hasScope('username')")
     @GetMapping("/username")

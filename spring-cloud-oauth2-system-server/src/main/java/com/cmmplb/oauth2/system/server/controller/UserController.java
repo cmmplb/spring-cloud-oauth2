@@ -1,6 +1,8 @@
 package com.cmmplb.oauth2.system.server.controller;
 
 import com.cmmplb.oauth2.resource.server.bean.UserInfoVO;
+import com.cmmplb.oauth2.resource.server.result.Result;
+import com.cmmplb.oauth2.resource.server.result.ResultUtil;
 import com.cmmplb.oauth2.system.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,26 +23,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/health")
-    public String health() {
-        return "ok";
-    }
-
-    // @AuthIgnore
-    // @WithoutLogin
     @GetMapping("/info/{username}")
-    public UserInfoVO getByUsername(@PathVariable String username) {
-        return userService.getByUsername(username);
-    }
-
-    // @AuthIgnore
-    @GetMapping("/info/mobile/{mobile}")
-    public UserInfoVO getByMobile(@PathVariable String mobile) {
-        return userService.getByMobile(mobile);
-    }
-
-    @GetMapping("/info")
-    public UserInfoVO getInfo() {
-        return userService.getByUsername("SecurityUtil.getUsername()");
+    public Result<UserInfoVO> getByUsername(@PathVariable String username) {
+        return ResultUtil.success(userService.getByUsername(username));
     }
 }

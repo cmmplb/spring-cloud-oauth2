@@ -2,5 +2,5 @@ logging:
   # log level(trace < debug < info < warn < error)
   level:
     root: info
-    org.springframework: debug
-    com.cmmplb: debug
+    org.springframework: info
+    com.cmmplb: info

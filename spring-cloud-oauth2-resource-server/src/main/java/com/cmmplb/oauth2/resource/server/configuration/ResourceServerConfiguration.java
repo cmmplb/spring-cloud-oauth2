@@ -2,6 +2,8 @@ package com.cmmplb.oauth2.resource.server.configuration;
 
 import com.cmmplb.oauth2.resource.server.handler.AccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
@@ -35,5 +37,17 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         resources.tokenServices(remoteTokenServices);
         // 权限不足处理
         resources.accessDeniedHandler(accessDeniedHandler);
+    }
+
+    /**
+     * 配置资源接口安全
+     */
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.authorizeRequests();
+        // 配置不需要安全拦截url
+        registry.antMatchers("/user/info/*").permitAll();
+        // 其余接口都需要认证
+        registry.anyRequest().authenticated().and().csrf().disable();
     }
 }

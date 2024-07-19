@@ -10,14 +10,14 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
-* @author penglibo
-* @date 2021-11-05 15:52:45
-* @since jdk 1.8
+ * @author penglibo
+ * @date 2024-07-02 17:42:12
+ * @since jdk 1.8
  * 系统用户表
-*/
+ */
 
 @Data
-@TableName(value = "sys_user")
+@TableName(value = "user")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
