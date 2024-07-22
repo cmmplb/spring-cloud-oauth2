@@ -46,7 +46,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public void configure(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.authorizeRequests();
         // 配置不需要安全拦截url
-        registry.antMatchers("/user/info/*").permitAll();
+        registry.antMatchers("/user/info/*", "/user/info/mobile/*").permitAll();
         // 其余接口都需要认证
         registry.anyRequest().authenticated().and().csrf().disable();
     }

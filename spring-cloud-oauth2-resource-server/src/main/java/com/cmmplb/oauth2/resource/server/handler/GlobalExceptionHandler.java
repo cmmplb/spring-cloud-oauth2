@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -101,6 +102,11 @@ public class GlobalExceptionHandler<T> implements ResponseBodyAdvice<T> {
                 }
             }
             return ResultUtil.custom(HttpCodeEnum.METHOD_NOT_ALLOWED.getCode(), sb.toString());
+        }
+
+        // 权限不足
+        if ((e instanceof AccessDeniedException)) {
+            return ResultUtil.custom(HttpCodeEnum.FORBIDDEN);
         }
 
         // 上述异常都没匹配

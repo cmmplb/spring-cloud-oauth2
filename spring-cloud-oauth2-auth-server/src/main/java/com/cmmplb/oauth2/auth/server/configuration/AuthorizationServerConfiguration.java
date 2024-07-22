@@ -1,7 +1,9 @@
 package com.cmmplb.oauth2.auth.server.configuration;
 
 import com.cmmplb.oauth2.resource.server.handler.GlobalWebResponseExceptionTranslator;
+import com.cmmplb.oauth2.resource.server.mobile.MobileTokenGranter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,10 +13,15 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
+import org.springframework.security.oauth2.provider.CompositeTokenGranter;
+import org.springframework.security.oauth2.provider.TokenGranter;
+import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * @author penglibo
@@ -59,6 +66,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .userDetailsService(userDetailsService)
                 // 配置认证管理器
                 .authenticationManager(authenticationManager)
+                // 配置grant_type模式
+                .tokenGranter(tokenGranter(endpoints))
                 // 配置token存储
                 .tokenStore(tokenStore)
                 // 自定义异常处理
@@ -119,5 +128,21 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 // 登录成功回调地址，这里如果配置了多个，则请求地址需要携带redirect_uri参数，并且值是配置的其中一个，如果只配置一个，则可以不带redirect_uri参数
                 .redirectUris("http://localhost:10000/auth/actuator/health", "http://localhost:20000/actuator/health", "http://localhost:18080/auth")
                 .authorizedGrantTypes("client_credentials", "password", "implicit", "authorization_code", "refresh_token");
+    }
+
+    /**
+     * 创建grant_type列表，如果不配置则默认使用密码模式、简化模式、授权码模式、客户端模式以及刷新token模式
+     * {@link AuthorizationServerEndpointsConfigurer#getDefaultTokenGranters()}
+     * 如果配置了只使用配置中，默认配置失效
+     * @param endpoints 端点配置器
+     * @return TokenGranter
+     */
+    private TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
+        // 在原有配置下添加手机号验证码模式
+        TokenGranter tokenGranter = endpoints.getTokenGranter();
+        ArrayList<TokenGranter> tokenGranters = new ArrayList<>(Collections.singletonList(tokenGranter));
+        // 添加一个自定义手机号验证码模式
+        tokenGranters.add(new MobileTokenGranter(endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory(), authenticationManager));
+        return new CompositeTokenGranter(tokenGranters);
     }
 }

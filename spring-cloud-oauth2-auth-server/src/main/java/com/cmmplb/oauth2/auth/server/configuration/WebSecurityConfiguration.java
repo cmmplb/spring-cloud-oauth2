@@ -1,5 +1,7 @@
 package com.cmmplb.oauth2.auth.server.configuration;
 
+import com.cmmplb.oauth2.resource.server.mobile.MobileAuthenticationProvider;
+import com.cmmplb.oauth2.resource.server.service.UserDetailsService;
 import com.cmmplb.oauth2.resource.server.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -35,6 +36,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
+                // 注册手机号验证码登录提供器
+                .authenticationProvider(mobileAuthenticationProvider())
                 // 表单登录
                 .formLogin().permitAll()
                 // 登录页面路径，默认/login，由于默认的登录页引用了bootstrapcdn，网络不通情况导致页面一直加载，直到bootstrap.min.css超时才响应，
@@ -63,6 +66,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
         auth.userDetailsService(userDetailsService);
         // 基于内存中的身份验证
         // inMemoryAuthentication(auth);
+        auth.authenticationProvider(mobileAuthenticationProvider());
     }
 
     private void inMemoryAuthentication(AuthenticationManagerBuilder auth) throws Exception {
@@ -83,11 +87,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
                 .roles("USER");
     }
 
+    // 使用数据库加载用户，注释掉userDetailsServiceBean，不然注入UserDetailsService会显示有多个实现的bean，
+    // 也可以不移除，上面注入的private UserDetailsService userDetailsService; 就需要改成具体实现类：private UserDetailsServiceImpl userDetailsServiceImpl;
     // @Bean
     // @Override
     // public UserDetailsService userDetailsServiceBean() throws Exception {
     //     return super.userDetailsServiceBean();
     // }
+
+    @Bean
+    public MobileAuthenticationProvider mobileAuthenticationProvider() {
+        MobileAuthenticationProvider mobileAuthenticationProvider = new MobileAuthenticationProvider();
+        mobileAuthenticationProvider.setUserDetailsService(userDetailsService);
+        return mobileAuthenticationProvider;
+    }
 
     @Bean
     @Override

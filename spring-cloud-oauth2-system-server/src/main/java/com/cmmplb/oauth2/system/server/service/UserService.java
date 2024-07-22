@@ -19,5 +19,12 @@ public interface UserService extends IService<User> {
      * @return 用户信息
      */
     UserInfoVO getByUsername(String username);
+
+    /**
+     * 根据手机号获取用户信息
+     * @param mobile 手机号
+     * @return 用户信息
+     */
+    UserInfoVO getByMobile(String mobile);
 }
 

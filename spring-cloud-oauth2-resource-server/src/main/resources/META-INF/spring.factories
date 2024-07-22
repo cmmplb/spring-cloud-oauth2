@@ -2,4 +2,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.cmmplb.oauth2.resource.server.configuration.ResourceServerConfiguration,\
   com.cmmplb.oauth2.resource.server.configuration.ResourceAutoConfiguration,\
   com.cmmplb.oauth2.resource.server.handler.GlobalWebResponseExceptionTranslator,\
-  com.cmmplb.oauth2.resource.server.service.UserDetailsServiceImpl
+  com.cmmplb.oauth2.resource.server.service.impl.UserDetailsServiceImpl,\
+  com.cmmplb.oauth2.resource.server.handler.GlobalExceptionHandler

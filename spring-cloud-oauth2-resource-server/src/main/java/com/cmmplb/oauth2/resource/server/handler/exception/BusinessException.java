@@ -23,6 +23,11 @@ public class BusinessException extends RuntimeException {
 
     private String message;
 
+    public BusinessException() {
+        this.code = HttpCodeEnum.INTERNAL_SERVER_ERROR.getCode();
+        this.message = HttpCodeEnum.INTERNAL_SERVER_ERROR.getMessage();
+    }
+
     public BusinessException(String message) {
         this.code = HttpCodeEnum.INTERNAL_SERVER_ERROR.getCode();
         this.message = message;

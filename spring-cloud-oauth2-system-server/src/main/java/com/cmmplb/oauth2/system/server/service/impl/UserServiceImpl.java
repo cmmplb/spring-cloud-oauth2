@@ -3,6 +3,7 @@ package com.cmmplb.oauth2.system.server.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cmmplb.oauth2.resource.server.bean.UserInfoVO;
+import com.cmmplb.oauth2.resource.server.handler.exception.BusinessException;
 import com.cmmplb.oauth2.system.server.dao.UserMapper;
 import com.cmmplb.oauth2.system.server.entity.User;
 import com.cmmplb.oauth2.system.server.service.UserService;
@@ -26,7 +27,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public UserInfoVO getByUsername(String username) {
         User user = baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username));
         if (null == user) {
-            throw new RuntimeException("用户信息不存在");
+            throw new BusinessException("用户信息不存在");
+        }
+        return getUserInfoVO(user);
+    }
+
+    @Override
+    public UserInfoVO getByMobile(String mobile) {
+        User user = baseMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getMobile, mobile));
+        if (null == user) {
+            throw new BusinessException("用户信息不存在");
         }
         return getUserInfoVO(user);
     }

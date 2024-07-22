@@ -70,6 +70,10 @@ public enum HttpCodeEnum {
     FEIGN_ERROR(503, "内部服务调用异常"),
     NULL_POINT_ERROR(900, "空指针异常"),
     CLASS_CAST_ERROR(901, "类型转换异常"),
+
+    // 其他认证异常
+    BAD_CREDENTIALS(400, "用户名或密码错误"),
+    MOBILE_NOT_FOUND(400, "手机号或验证码错误"),
     ;
 
     private final int code;
