@@ -64,6 +64,7 @@ public class ResourceAutoConfiguration {
         remoteTokenServices.setClientId("web");
         remoteTokenServices.setClientSecret("123456");
         // 这个抽筋有时候会报错，No instances available for localhost，然后有时候下面那个又说UnNonHostException
+        // 后面打断的时候反应过来，这是重启的时候认证服务还没在Eureka注册好，多等一会儿就行了。0.0
         // remoteTokenServices.setCheckTokenEndpointUrl("http://localhost:20000/oauth/check_token");
         remoteTokenServices.setCheckTokenEndpointUrl("http://SPRING-CLOUD-OAUTH2-AUTH-SERVER/oauth/check_token");
         return remoteTokenServices;

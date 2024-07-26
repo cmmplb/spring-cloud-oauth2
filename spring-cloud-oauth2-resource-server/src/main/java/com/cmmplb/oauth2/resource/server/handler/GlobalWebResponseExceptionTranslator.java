@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.common.DefaultThrowableAnalyzer;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
+import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
 import org.springframework.security.web.util.ThrowableAnalyzer;
@@ -33,7 +34,7 @@ public class GlobalWebResponseExceptionTranslator implements WebResponseExceptio
         Throwable[] causeChain = throwableAnalyzer.determineCauseChain(e);
         Exception ase;
 
-        Result<String> result = ResultUtil.custom(e.getMessage());
+        Result<String> result = null;
         // 账号密码认证失败=>账号或密码错误
         ase = (UsernameNotFoundException) throwableAnalyzer.getFirstThrowableOfType(UsernameNotFoundException.class,
                 causeChain);
@@ -55,10 +56,22 @@ public class GlobalWebResponseExceptionTranslator implements WebResponseExceptio
             result = ResultUtil.custom(HttpCodeEnum.BAD_CREDENTIALS);
         }
 
+        // 无效token
+        ase = (InvalidTokenException) throwableAnalyzer.getFirstThrowableOfType(InvalidTokenException.class,
+                causeChain);
+        if (null != ase) {
+            result = ResultUtil.custom(HttpCodeEnum.UNAUTHORIZED);
+        }
+
         // todo:还有一些权限异常后续使用到再添加
 
-        // 不包含上述异常则服务器内部错误
-        log.error("认证服务器异常:{}", e.getMessage());
+        if (null == result) {
+            result = ResultUtil.custom(e.getMessage());
+            // 不包含上述异常则服务器内部错误
+            log.error("认证服务器异常:{}", e.getMessage());
+        } else {
+            log.info("认证服务器异常:{}", e.getMessage());
+        }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

@@ -1,7 +1,8 @@
-package com.cmmplb.oauth2.resource.server.service.impl;
+package com.cmmplb.oauth2.resource.server.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.cmmplb.oauth2.resource.server.bean.User;
 import com.cmmplb.oauth2.resource.server.bean.UserInfoVO;
 import com.cmmplb.oauth2.resource.server.handler.exception.BusinessException;
 import com.cmmplb.oauth2.resource.server.handler.exception.MobileNotFoundException;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.CollectionUtils;
@@ -95,7 +95,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserInfoVO.UserVO user = info.getUser();
         // org.springframework.security.oauth2.provider.token.DefaultAuthenticationKeyGenerator
         // redis的key生成规则是这个values里面的三个字段，client_id、scope、username，防止账号密码登录和手机号登录使用缓存同一个，手机号username为mobile
-        return new User(username, user.getPassword(), true, true,
+        // 扩展id字段
+        return new User(user.getId(), username, user.getPassword(), true, true,
                 true, true, authorityArrayList);
     }
 }

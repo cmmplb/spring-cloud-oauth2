@@ -1,4 +1,4 @@
-package com.cmmplb.oauth2.resource.server.service.impl;
+package com.cmmplb.oauth2.resource.server.impl;
 
 import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
 

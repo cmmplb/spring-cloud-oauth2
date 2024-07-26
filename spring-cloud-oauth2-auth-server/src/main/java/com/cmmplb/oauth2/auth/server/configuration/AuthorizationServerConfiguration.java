@@ -1,16 +1,17 @@
 package com.cmmplb.oauth2.auth.server.configuration;
 
+import com.cmmplb.oauth2.resource.server.bean.User;
 import com.cmmplb.oauth2.resource.server.handler.GlobalWebResponseExceptionTranslator;
+import com.cmmplb.oauth2.resource.server.impl.TokenEnhancerImpl;
 import com.cmmplb.oauth2.resource.server.mobile.MobileTokenGranter;
-import com.cmmplb.oauth2.resource.server.service.impl.JdbcApprovalStoreImpl;
+import com.cmmplb.oauth2.resource.server.impl.JdbcApprovalStoreImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.token.JdbcClientTokenServices;
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -21,13 +22,14 @@ import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author penglibo
@@ -74,6 +76,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .authenticationManager(authenticationManager)
                 // 配置grant_type模式
                 .tokenGranter(tokenGranter(endpoints))
+                // 拓展token信息
+                .tokenEnhancer(tokenEnhancer())
                 // 配置token存储
                 .tokenStore(tokenStore)
                 // 配置授权存储
@@ -156,10 +160,17 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         return new CompositeTokenGranter(tokenGranters);
     }
 
+
+    /**
+     * 拓展token信息
+     */
+    public TokenEnhancer tokenEnhancer() {
+        return new TokenEnhancerImpl();
+    }
+
     /**
      * 基于数据库获取授权信息
      */
-    @Bean
     public ApprovalStore approvalStore() {
         return new JdbcApprovalStoreImpl(dataSource);
     }
@@ -167,7 +178,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     /**
      * 基于数据库存储授权码信息
      */
-    @Bean
     public AuthorizationCodeServices authorizationCodeServices() {
         return new JdbcAuthorizationCodeServices(dataSource);
     }

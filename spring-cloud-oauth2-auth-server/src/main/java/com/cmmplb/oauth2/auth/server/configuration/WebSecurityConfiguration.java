@@ -37,8 +37,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
     public void configure(HttpSecurity http) throws Exception {
         http
                 // 受保护的资源路径，其他路径则交给资源服务器处理
-                // .requestMatchers().antMatchers("/oauth/authorize", "/oauth/login", "/login")
-                // .and()
+                .requestMatchers().antMatchers("/oauth/authorize", "/oauth/login", "/login", "/logout")
+                .and()
                 // 注册手机号验证码登录提供器
                 .authenticationProvider(mobileAuthenticationProvider())
                 // 表单登录
@@ -53,8 +53,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
                 // 放行登录页面引用的css
                 .antMatchers("/css/**").permitAll()
                 .anyRequest().authenticated()
+                .and()
                 // 关闭跨域保护
-                .and().csrf().disable();
+                .csrf().disable();
     }
 
     @Override
