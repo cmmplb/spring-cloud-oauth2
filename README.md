@@ -42,6 +42,22 @@ feature
 ├── 2.6         自定义认证模式
 ````
 
+**认证服务四种模式**
+
+![3.png](doc%2Fimages%2F2.1%2F3.png)
+
+![4.png](doc%2Fimages%2F2.1%2F4.png)
+
+![5.png](doc%2Fimages%2F2.1%2F5.png)
+
+![6.png](doc%2Fimages%2F2.1%2F6.png)
+
+**登录和授权页面替换**
+
+![login.png](doc%2Fimages%2F2.4%2Flogin.png)
+
+![approval.png](doc%2Fimages%2F2.4%2Fapproval.png)
+
 学习参考地址:
 
 `https://gitee.com/copoile/springcloud-oauth2`

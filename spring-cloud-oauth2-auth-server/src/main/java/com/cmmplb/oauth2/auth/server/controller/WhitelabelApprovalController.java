@@ -71,6 +71,9 @@ public class WhitelabelApprovalController {
                 map.put(scope, "手机号");
             }
             if ("age".equals(scope)) {
+                map.put(scope, "年龄");
+            }
+            if ("sex".equals(scope)) {
                 map.put(scope, "性别");
             }
         }

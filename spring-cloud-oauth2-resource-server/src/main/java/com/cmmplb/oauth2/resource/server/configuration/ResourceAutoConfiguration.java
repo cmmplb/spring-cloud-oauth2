@@ -7,14 +7,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.oauth2.provider.approval.ApprovalStore;
-import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.token.AccessTokenProvider;
+import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
+import org.springframework.security.oauth2.client.token.JdbcClientTokenServices;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
+import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+
+import javax.sql.DataSource;
+import java.util.Arrays;
 
 /**
  * @author penglibo
@@ -28,12 +38,18 @@ public class ResourceAutoConfiguration {
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
 
+    @Autowired
+    private DataSource dataSource;
+
     /**
      * 令牌存储
      */
     @Bean
     public TokenStore redisTokenStore() {
-        return new RedisTokenStore(redisConnectionFactory);
+        // 基于redis缓存存储token
+        // return new RedisTokenStore(redisConnectionFactory);
+        // 基于数据库存储
+        return new JdbcTokenStore(dataSource);
     }
 
     /**
@@ -52,6 +68,15 @@ public class ResourceAutoConfiguration {
         remoteTokenServices.setCheckTokenEndpointUrl("http://SPRING-CLOUD-OAUTH2-AUTH-SERVER/oauth/check_token");
         return remoteTokenServices;
     }
+
+    /**
+     * 通过令牌获取用户信息来验证有效性
+     * todo:后续处理
+     */
+    // @Bean
+    // public UserInfoTokenServices userInfoTokenServices() {
+    //     return new UserInfoTokenServices("http://localhost:20000/oauth/user", "web");
+    // }
 
     /**
      * 服务调用
@@ -81,4 +106,11 @@ public class ResourceAutoConfiguration {
         return new AccessDeniedHandler();
     }
 
+    /**
+     * 基于数据库存储客户端令牌
+     */
+    @Bean
+    public JdbcClientTokenServices clientTokenServices() {
+        return new JdbcClientTokenServices(dataSource);
+    }
 }

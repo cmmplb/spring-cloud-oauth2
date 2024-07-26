@@ -33,7 +33,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public void configure(ResourceServerSecurityConfigurer resources) {
         // token存取
         resources.tokenStore(tokenStore);
-        // 通过这个Bean，去远程调用认证服务器，验token
+        // 远程调用认证服务器校验token有效性
         resources.tokenServices(remoteTokenServices);
         // 权限不足处理
         resources.accessDeniedHandler(accessDeniedHandler);
@@ -46,7 +46,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public void configure(HttpSecurity http) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = http.authorizeRequests();
         // 配置不需要安全拦截url
-        registry.antMatchers("/user/info/*", "/user/info/mobile/*").permitAll();
+        registry.antMatchers("/user/info/*", "/user/info/mobile/*", "/client/login").permitAll();
         // 其余接口都需要认证
         registry.anyRequest().authenticated().and().csrf().disable();
     }

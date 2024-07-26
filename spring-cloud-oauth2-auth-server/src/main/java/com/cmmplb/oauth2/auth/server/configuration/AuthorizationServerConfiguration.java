@@ -2,12 +2,15 @@ package com.cmmplb.oauth2.auth.server.configuration;
 
 import com.cmmplb.oauth2.resource.server.handler.GlobalWebResponseExceptionTranslator;
 import com.cmmplb.oauth2.resource.server.mobile.MobileTokenGranter;
+import com.cmmplb.oauth2.resource.server.service.impl.JdbcApprovalStoreImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.token.JdbcClientTokenServices;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -16,8 +19,11 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
-import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -70,6 +76,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .tokenGranter(tokenGranter(endpoints))
                 // 配置token存储
                 .tokenStore(tokenStore)
+                // 配置授权存储
+                .approvalStore(approvalStore())
+                // 配置授权码存储
+                .authorizationCodeServices(authorizationCodeServices())
                 // 自定义异常处理
                 .exceptionTranslator(globalWebResponseExceptionTranslator)
                 // 替换默认的授权页面地址，参数1是默认地址，参数2是自定义地址
@@ -144,5 +154,21 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         // 添加一个自定义手机号验证码模式
         tokenGranters.add(new MobileTokenGranter(endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory(), authenticationManager));
         return new CompositeTokenGranter(tokenGranters);
+    }
+
+    /**
+     * 基于数据库获取授权信息
+     */
+    @Bean
+    public ApprovalStore approvalStore() {
+        return new JdbcApprovalStoreImpl(dataSource);
+    }
+
+    /**
+     * 基于数据库存储授权码信息
+     */
+    @Bean
+    public AuthorizationCodeServices authorizationCodeServices() {
+        return new JdbcAuthorizationCodeServices(dataSource);
     }
 }
