@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>spring-cloud-oauth2-sso-two-server</title>
+  <style>
+      * {
+          margin: 0;
+          padding: 0;
+      }
+
+      html {
+          height: 100%;
+      }
+
+      body {
+          height: 100%;
+      }
+
+      .container {
+          height: 100%;
+          display: flex;
+          justify-content: center;
+      }
+
+      .sso-wrapper {
+          margin-top: 50px;
+      }
+
+      .title {
+          font-size: 38px;
+          font-weight: bold;
+      }
+
+      .info {
+          margin-top: 20px;
+      }
+
+      .content {
+          margin-top: 20px;
+          font-size: 20px;
+      }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sso-wrapper">
+    <div class="title">spring-cloud-oauth2-sso-two-server</div>
+    <div class="info" th:text="'当前登录信息：' + ${username}"></div>
+    <div class="content">
+      <span>
+        跳转到<a th:href="${ssoOneUrl}">spring-cloud-oauth2-sso-one-server</a>
+      </span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

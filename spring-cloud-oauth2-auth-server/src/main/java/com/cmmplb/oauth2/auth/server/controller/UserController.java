@@ -1,5 +1,6 @@
 package com.cmmplb.oauth2.auth.server.controller;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
  * @since jdk 1.8
  */
 @RestController
-@RequestMapping("/oauth")
+@RequestMapping("/user")
 public class UserController {
 
     /**
      * 提供user-info-uri端点
      */
-    @RequestMapping("/user")
-    public Object user() {
+    @RequestMapping("/info")
+    public Authentication info() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 }

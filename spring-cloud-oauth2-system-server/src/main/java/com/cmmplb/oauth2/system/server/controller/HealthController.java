@@ -1,5 +1,6 @@
 package com.cmmplb.oauth2.system.server.controller;
 
+import com.cmmplb.oauth2.resource.server.annotation.WithoutLogin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since jdk 1.8
  */
 
+@WithoutLogin
 @RestController
 public class HealthController {
 

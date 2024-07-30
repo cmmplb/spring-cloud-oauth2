@@ -13,7 +13,10 @@ spring:
     # 引用配置文件
     include:
       - database
-      - eureka-client
+      - eureka_client
       - management
-      - mybatis-plus
+      - mybatis_plus
       - redis
+      - rest_template
+      - security
+      - security_oauth2

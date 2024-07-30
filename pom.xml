@@ -15,7 +15,9 @@
     <!-- 项目名称 -->
     <name>${project.artifactId}</name>
     <!-- 描述信息 -->
-    <description>服务注册中心</description>
+    <description>spring-cloud-oauth2</description>
+    <!-- 项目URL地址 -->
+    <url>https://gitee.com/cmmplb/spring-boot-starter</url>
 
     <!-- 子模块 -->
     <modules>
@@ -23,6 +25,7 @@
         <module>spring-cloud-oauth2-eureka-server</module>
         <module>spring-cloud-oauth2-gateway-server</module>
         <module>spring-cloud-oauth2-resource-server</module>
+        <module>spring-cloud-oauth2-sso-server</module>
         <module>spring-cloud-oauth2-system-server</module>
     </modules>
 
@@ -47,6 +50,8 @@
         <gateway.server.port>10000</gateway.server.port>
         <auth.server.port>20000</auth.server.port>
         <system.server.port>30000</system.server.port>
+        <sso.one.server.port>40000</sso.one.server.port>
+        <sso.two.server.port>50000</sso.two.server.port>
 
         <!-- 连接配置 -->
         <mysql.url>localhost:3306/spring_cloud_oauth2</mysql.url>

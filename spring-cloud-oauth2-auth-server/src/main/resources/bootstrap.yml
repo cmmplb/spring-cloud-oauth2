@@ -13,7 +13,7 @@ spring:
     # 引用配置文件
     include:
       - database
-      - eureka-client
+      - eureka_client
       - logging
       - management
       - redis

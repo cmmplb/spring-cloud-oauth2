@@ -1,5 +1,6 @@
 package com.cmmplb.oauth2.system.server.controller;
 
+import com.cmmplb.oauth2.resource.server.annotation.WithoutLogin;
 import com.cmmplb.oauth2.resource.server.bean.UserInfoVO;
 import com.cmmplb.oauth2.resource.server.result.Result;
 import com.cmmplb.oauth2.resource.server.result.ResultUtil;

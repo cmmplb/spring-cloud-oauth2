@@ -1,30 +1,33 @@
 package com.cmmplb.oauth2.resource.server.configuration;
 
+import com.cmmplb.oauth2.resource.server.configuration.properties.RestTemplateProperties;
 import com.cmmplb.oauth2.resource.server.handler.AccessDeniedHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.token.AccessTokenProvider;
-import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
+import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.JdbcClientTokenServices;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
 import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 
 /**
  * @author penglibo
@@ -32,7 +35,8 @@ import java.util.Arrays;
  * @since jdk 1.8
  */
 
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalAuthentication
+@EnableConfigurationProperties(RestTemplateProperties.class)
 public class ResourceAutoConfiguration {
 
     @Autowired
@@ -40,6 +44,12 @@ public class ResourceAutoConfiguration {
 
     @Autowired
     private DataSource dataSource;
+
+    @Autowired
+    private RestTemplateProperties restTemplateProperties;
+
+    @Autowired
+    private ResourceServerProperties resourceServerProperties;
 
     /**
      * 令牌存储
@@ -56,28 +66,35 @@ public class ResourceAutoConfiguration {
      * 远程令牌服务
      */
     @Bean
-    @Primary
-    public RemoteTokenServices remoteTokenServices() {
-        RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
-        remoteTokenServices.setRestTemplate(restTemplate());
-        // 这里到时候可以通过配置文件获取，现在先固定
-        remoteTokenServices.setClientId("web");
-        remoteTokenServices.setClientSecret("123456");
-        // 这个抽筋有时候会报错，No instances available for localhost，然后有时候下面那个又说UnNonHostException
-        // 后面打断的时候反应过来，这是重启的时候认证服务还没在Eureka注册好，多等一会儿就行了。0.0
-        // remoteTokenServices.setCheckTokenEndpointUrl("http://localhost:20000/oauth/check_token");
-        remoteTokenServices.setCheckTokenEndpointUrl("http://SPRING-CLOUD-OAUTH2-AUTH-SERVER/oauth/check_token");
-        return remoteTokenServices;
+    public ResourceServerTokenServices resourceServerTokenServices() {
+        // 使用代码配置，会覆盖配置文件中实例，org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerTokenServicesConfiguration.RemoteTokenServicesConfiguration.UserInfoTokenServicesConfiguration.userInfoTokenServices
+        if (resourceServerProperties.isPreferTokenInfo()) {
+            RemoteTokenServices remoteTokenServices = new RemoteTokenServices();
+            remoteTokenServices.setRestTemplate(restTemplate());
+            // 通过org.springframework.boot.autoconfigure.security.oauth2.OAuth2AutoConfiguration
+            // 从OAuth2ClientProperties把clientId和clientSecret设置到ResourceServerProperties
+            remoteTokenServices.setClientId(resourceServerProperties.getClientId());
+            remoteTokenServices.setClientSecret(resourceServerProperties.getClientSecret());
+            remoteTokenServices.setCheckTokenEndpointUrl(resourceServerProperties.getTokenInfoUri());
+            return remoteTokenServices;
+        } else {
+            UserInfoTokenServices userInfoTokenServices = new UserInfoTokenServices(
+                    resourceServerProperties.getUserInfoUri(), resourceServerProperties.getClientId());
+            userInfoTokenServices.setRestTemplate(oAuth2RestTemplate());
+            return userInfoTokenServices;
+        }
     }
 
     /**
-     * 通过令牌获取用户信息来验证有效性
-     * todo:后续处理
+     * 服务调用
      */
-    // @Bean
-    // public UserInfoTokenServices userInfoTokenServices() {
-    //     return new UserInfoTokenServices("http://localhost:20000/oauth/user", "web");
-    // }
+    @Bean
+    @LoadBalanced
+    public OAuth2RestTemplate oAuth2RestTemplate() {
+        BaseOAuth2ProtectedResourceDetails resource = new BaseOAuth2ProtectedResourceDetails();
+        resource.setClientId(resourceServerProperties.getClientId());
+        return new OAuth2RestTemplate(resource);
+    }
 
     /**
      * 服务调用
@@ -88,7 +105,24 @@ public class ResourceAutoConfiguration {
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
+        restTemplate.setRequestFactory(getSimpleClientFactory());
         return restTemplate;
+    }
+
+
+    /**
+     * 手动创建SimpleClientHttpRequestFactory，指定超时时间以及代理配置
+     */
+    private SimpleClientHttpRequestFactory getSimpleClientFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(restTemplateProperties.getReadTimeout());
+        factory.setConnectTimeout(restTemplateProperties.getConnectionTimeout());
+        RestTemplateProperties.Proxy proxy = restTemplateProperties.getProxy();
+        if (proxy.getEnabled()) {
+            SocketAddress address = new InetSocketAddress(proxy.getHost(), proxy.getPort());
+            factory.setProxy(new Proxy(Proxy.Type.HTTP, address));
+        }
+        return factory;
     }
 
     /**

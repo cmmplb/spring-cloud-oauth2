@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- 父工程 -->
+    <parent>
+        <artifactId>spring-cloud-oauth2</artifactId>
+        <groupId>com.cmmplb</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <!-- 指定当前POM模型的版本 -->
+    <modelVersion>4.0.0</modelVersion>
+    <!-- 项目的唯一的标识符，实际对应项目的名称，就是项目根目录的名称。 -->
+    <artifactId>spring-cloud-oauth2-sso-server</artifactId>
+    <!-- 项目的打包类型：pom、jar、war -->
+    <packaging>pom</packaging>
+    <!-- 项目名称 -->
+    <name>${project.artifactId}</name>
+    <!-- 描述信息 -->
+    <description>sso模块</description>
+
+    <!-- 子模块 -->
+    <modules>
+        <module>spring-cloud-oauth2-sso-one-server</module>
+        <module>spring-cloud-oauth2-sso-two-server</module>
+    </modules>
+
+    <!-- 依赖 -->
+    <dependencies>
+        <!-- security-oauth2 -->
+        <dependency>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+        </dependency>
+        <!-- thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <!-- web启动器 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+</project>

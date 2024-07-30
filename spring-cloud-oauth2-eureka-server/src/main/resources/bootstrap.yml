@@ -12,4 +12,4 @@ spring:
   profiles:
     # 引用配置文件
     include:
-      - eureka-server
+      - eureka_server

@@ -1,0 +1,21 @@
+security:
+  oauth2:
+    client:
+      # 客户端id
+      client-id: sso-two
+      # 客户端密钥, 注意数据库存储的时候需要加密
+      client-secret: 123456
+      # 客户端重定向到认证服务请求授权的地址
+      user-authorization-uri: http://localhost:@auth.server.port@/oauth/authorize
+      # 获取token的地址
+      access-token-uri: http://localhost:@auth.server.port@/oauth/token
+    resource:
+      # 资源id
+      id: sso-two
+      # token-info-uri和user-info-uri配置其中一个就行, 同时配置的话则看prefer-token-info
+      # 使用RemoteTokenServices远程调用认证中心接口校验token获取用户认证信息-OAuth2Authentication
+      token-info-uri: http://localhost:@auth.server.port@/oauth/check_token
+      # 使用token-info-uri模式, 默认为true
+      prefer-token-info: false
+      # 使用UserInfoTokenServices远程调用认证中心接口获取当前用户认证信息-OAuth2Authentication
+      user-info-uri: http://localhost:@auth.server.port@/user/info

@@ -8,6 +8,7 @@ import com.cmmplb.oauth2.resource.server.impl.JdbcApprovalStoreImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,11 +18,14 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
@@ -43,22 +47,26 @@ import java.util.Map;
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private TokenStore tokenStore;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private DataSource dataSource;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private TokenStore tokenStore;
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private ClientDetailsService clientDetailsService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private GlobalWebResponseExceptionTranslator globalWebResponseExceptionTranslator;
 
-    @Autowired
-    private DataSource dataSource;
 
     /**
      * 配置授权服务器端点的非安全功能，如令牌存储、令牌自定义、用户批准和授权类型。
@@ -80,6 +88,8 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 .tokenEnhancer(tokenEnhancer())
                 // 配置token存储
                 .tokenStore(tokenStore)
+                // 认证服务器的token服务
+                .tokenServices(tokenServices())
                 // 配置授权存储
                 .approvalStore(approvalStore())
                 // 配置授权码存储
@@ -116,6 +126,21 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         jdbc(clients);
         // 基于内存配置
         // inMemory(clients);
+    }
+
+    /**
+     * 认证服务器的token服务，使用@Primary覆盖ResourceServerTokenServices
+     */
+    @Bean
+    @Primary
+    public AuthorizationServerTokenServices tokenServices() {
+        DefaultTokenServices tokenServices = new DefaultTokenServices();
+        tokenServices.setTokenStore(tokenStore);
+        tokenServices.setSupportRefreshToken(true);
+        tokenServices.setReuseRefreshToken(true);
+        tokenServices.setTokenEnhancer(tokenEnhancer());
+        tokenServices.setClientDetailsService(clientDetailsService);
+        return tokenServices;
     }
 
     /**
@@ -159,7 +184,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         tokenGranters.add(new MobileTokenGranter(endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory(), authenticationManager));
         return new CompositeTokenGranter(tokenGranters);
     }
-
 
     /**
      * 拓展token信息

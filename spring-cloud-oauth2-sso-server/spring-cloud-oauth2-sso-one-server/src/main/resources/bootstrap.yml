@@ -1,0 +1,21 @@
+server:
+  # 服务端口, 引用pom文件变量
+  port: @sso.one.server.port@
+  two-port: @sso.two.server.port@
+  servlet:
+    # 路径
+    context-path: /
+    # session配置
+    session:
+      cookie:
+        # 设置cookie名称, 防止默认的JSESSIONID冲突导致跳转到另一个服务需要重新登录, 也可以修改context-path路径
+        name: SSO-ONE-JSESSIONID
+
+spring:
+  application:
+    # 应用程序名称
+    name: @project.artifactId@
+  profiles:
+    # 引用配置文件
+    include:
+      - security_oauth2

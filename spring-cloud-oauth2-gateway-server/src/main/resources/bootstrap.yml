@@ -13,5 +13,5 @@ spring:
     # 引用配置文件
     include:
       - compression
-      - eureka-client
+      - eureka_client
       - gateway
