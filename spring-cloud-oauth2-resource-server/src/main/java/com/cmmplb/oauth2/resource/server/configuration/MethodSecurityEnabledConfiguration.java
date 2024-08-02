@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
  * 开启/关闭注解权限控制
  */
 
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @ConditionalOnProperty(prefix = SecurityProperties.PREFIX, name = SecurityProperties.ENABLED, havingValue = "true")
 public class MethodSecurityEnabledConfiguration {
 
