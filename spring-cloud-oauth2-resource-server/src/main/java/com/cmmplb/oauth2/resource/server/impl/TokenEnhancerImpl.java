@@ -21,9 +21,11 @@ public class TokenEnhancerImpl implements TokenEnhancer {
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
         final Map<String, Object> additionalInfo = new HashMap<>(2);
         if (null != authentication.getUserAuthentication()) {
-            User user = (User) authentication.getUserAuthentication().getPrincipal();
-            // 添加用户id字段
-            additionalInfo.put(User.COLUMN_USER_ID, user.getId());
+            Object principal = authentication.getUserAuthentication().getPrincipal();
+            if (principal instanceof User) {
+                // 添加用户id字段
+                additionalInfo.put(User.COLUMN_USER_ID, ((User) principal).getId());
+            }
         }
         ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
         return accessToken;

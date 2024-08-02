@@ -1,21 +1,28 @@
 package com.cmmplb.oauth2.auth.server.configuration;
 
+import com.cmmplb.oauth2.resource.server.configuration.properties.Oauth2ConfigProperties;
 import com.cmmplb.oauth2.resource.server.mobile.MobileAuthenticationProvider;
 import com.cmmplb.oauth2.resource.server.service.UserDetailsService;
 import com.cmmplb.oauth2.resource.server.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.UserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 /**
  * @author penglibo
@@ -28,9 +35,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Order(1)
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(Oauth2ConfigProperties.class)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     @Autowired
+    private Oauth2ConfigProperties oauth2ConfigProperties;
+
+    @Autowired(required = false)
     private UserDetailsService userDetailsService;
 
     @Override
@@ -66,38 +77,40 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter imple
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // 自定义用户信息验证
-        auth.userDetailsService(userDetailsService);
-        // 基于内存中的身份验证
-        // inMemoryAuthentication(auth);
         auth.authenticationProvider(mobileAuthenticationProvider());
+        if (oauth2ConfigProperties.getUserDetailsServiceType().equals(Oauth2ConfigProperties.UserDetailsServiceType.JDBC)) {
+            auth.userDetailsService(userDetailsService);
+        } else {
+            List<Oauth2ConfigProperties.BaseUserDetails> users = oauth2ConfigProperties.getUsers();
+            // 基于内存中的身份验证
+            InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> configurer = auth.inMemoryAuthentication()
+                    .passwordEncoder(passwordEncoder());
+            for (Oauth2ConfigProperties.BaseUserDetails user : users) {
+                UserDetailsManagerConfigurer<AuthenticationManagerBuilder, InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder>>.UserDetailsBuilder userDetailsBuilder = configurer
+                        .withUser(user.getUsername());
+                userDetailsBuilder.password(passwordEncoder().encode(user.getPassword()))
+                        .accountExpired(user.isAccountNonExpired()).accountLocked(user.isAccountNonLock())
+                        .credentialsExpired(user.isCredentialsNonExpired()).disabled(user.isDisable());
+                if (!CollectionUtils.isEmpty(user.getRoles())) {
+                    userDetailsBuilder.roles(user.getRoles().toArray(new String[0]));
+                }
+                if (!CollectionUtils.isEmpty(user.getAuthorities())) {
+                    userDetailsBuilder.authorities(user.getAuthorities().toArray(new String[0]));
+                }
+            }
+        }
     }
 
-    private void inMemoryAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                // 基于内存中的身份验证
-                .inMemoryAuthentication()
-                .passwordEncoder(passwordEncoder())
-
-                // 模拟管理员用户
-                .withUser("admin")
-                .password(passwordEncoder().encode("123456"))
-                .roles("ADMIN")
-                .and()
-
-                // 模拟普通用户
-                .withUser("user")
-                .password(passwordEncoder().encode("123456"))
-                .roles("USER");
+    /**
+     * 使用数据库加载用户，注释掉userDetailsServiceBean，不然注入UserDetailsService会显示有多个实现的bean
+     * 也可以不移除，上面注入的private UserDetailsService userDetailsService; 就需要改成具体实现类：private UserDetailsServiceImpl userDetailsServiceImpl
+     * 或者自定义UserDetailsService
+     */
+    @Bean
+    @Override
+    public org.springframework.security.core.userdetails.UserDetailsService userDetailsServiceBean() throws Exception {
+        return super.userDetailsServiceBean();
     }
-
-    // 使用数据库加载用户，注释掉userDetailsServiceBean，不然注入UserDetailsService会显示有多个实现的bean，
-    // 也可以不移除，上面注入的private UserDetailsService userDetailsService; 就需要改成具体实现类：private UserDetailsServiceImpl userDetailsServiceImpl;
-    // @Bean
-    // @Override
-    // public UserDetailsService userDetailsServiceBean() throws Exception {
-    //     return super.userDetailsServiceBean();
-    // }
 
     @Bean
     public MobileAuthenticationProvider mobileAuthenticationProvider() {

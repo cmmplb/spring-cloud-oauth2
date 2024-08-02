@@ -15,6 +15,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -41,7 +42,7 @@ public class SecurityProperties implements InitializingBean, ApplicationContextA
      * --system: /user/info/*,/user/info/mobile/*,/client/login
      * 前面的--是为了防止格式化代码, 往前缩进了，实际配置前面需要两个空格。0.0
      */
-    private Map<String, String> whiteList;
+    private Map<String, String> whiteList = new HashMap<>();
 
     public static final String PREFIX = "security";
 

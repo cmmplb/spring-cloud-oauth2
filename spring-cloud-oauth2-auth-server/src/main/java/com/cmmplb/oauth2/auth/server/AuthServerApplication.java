@@ -3,6 +3,7 @@ package com.cmmplb.oauth2.auth.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 /**
  * @author penglibo
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since jdk 1.8
  */
 
+@EnableFeignClients("com.cmmplb.oauth2.system.server.api")
 @SpringBootApplication
 public class AuthServerApplication {
 

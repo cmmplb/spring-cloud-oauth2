@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!-- 父工程 -->
+    <parent>
+        <artifactId>spring-cloud-oauth2</artifactId>
+        <groupId>com.cmmplb</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <!-- 指定当前POM模型的版本 -->
+    <modelVersion>4.0.0</modelVersion>
+    <!-- 项目的唯一的标识符，实际对应项目的名称，就是项目根目录的名称。 -->
+    <artifactId>spring-cloud-oauth2-system-server-api</artifactId>
+    <!-- 项目的打包类型：pom、jar、war -->
+    <packaging>jar</packaging>
+    <!-- 项目名称 -->
+    <name>${project.artifactId}</name>
+    <!-- 描述信息 -->
+    <description>系统api模块</description>
+
+    <!-- 依赖 -->
+    <dependencies>
+        <!-- openfeign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!-- loadbalancer -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+</project>

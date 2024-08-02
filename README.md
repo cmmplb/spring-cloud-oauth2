@@ -24,6 +24,9 @@ spring-cloud-oauth2
 ├── spring-cloud-oauth2-eureka-server                   注册中心 [8761]
 ├── spring-cloud-oauth2-gateway                         网关服务 [10000]
 ├── spring-cloud-oauth2-resource-server                 资源服务    
+├── spring-cloud-oauth2-sso-server                      单点登录    
+│   └── spring-cloud-oauth2-sso-one-server              单点登录 [40000]   
+│   └── spring-cloud-oauth2-sso-two-server              单点登录 [50000]   
 ├── spring-cloud-oauth2-system-server                   系统模块 [30000]
 ├── spring-cloud-oauth2-ui:                             前端框架 [18080]
 ├──pom.xml                                              父工程依赖
@@ -42,9 +45,12 @@ feature
 ├── 2.6         自定义认证模式
 ├── 2.7         基于数据库存取认证信息
 ├── 2.8         退出登录、事件监听和token信息扩展
+├── 2.9         SSO和配置提取
+├── 2.10        Feign和JWT令牌密钥配置
 ````
 
 ---- 
+
 1.模块搭建
 
 2.功能实现
@@ -64,6 +70,10 @@ feature
 [2.7.基于数据库存取认证信息.md](doc%2F2.%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0%2F2.7.%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AD%98%E5%8F%96%E8%AE%A4%E8%AF%81%E4%BF%A1%E6%81%AF.md)
 
 [2.8.退出登录、事件监听和token信息扩展.md](doc%2F2.%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0%2F2.8.%E9%80%80%E5%87%BA%E7%99%BB%E5%BD%95%E3%80%81%E4%BA%8B%E4%BB%B6%E7%9B%91%E5%90%AC%E5%92%8Ctoken%E4%BF%A1%E6%81%AF%E6%89%A9%E5%B1%95.md)
+
+[2.9.SSO和配置提取.md](doc%2F2.%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0%2F2.9.SSO%E5%92%8C%E9%85%8D%E7%BD%AE%E6%8F%90%E5%8F%96.md)
+
+[2.10.Feign和JWT令牌密钥配置.md](doc%2F2.%E5%8A%9F%E8%83%BD%E5%AE%9E%E7%8E%B0%2F2.10.Feign%E5%92%8CJWT%E4%BB%A4%E7%89%8C%E5%AF%86%E9%92%A5%E9%85%8D%E7%BD%AE.md)
 
 ---- 
 

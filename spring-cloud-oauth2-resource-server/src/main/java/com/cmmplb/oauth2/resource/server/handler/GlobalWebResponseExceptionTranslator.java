@@ -68,7 +68,7 @@ public class GlobalWebResponseExceptionTranslator implements WebResponseExceptio
         if (null == result) {
             result = ResultUtil.custom(e.getMessage());
             // 不包含上述异常则服务器内部错误
-            log.error("认证服务器异常:{}", e.getMessage());
+            log.error("认证服务器异常：", e);
         } else {
             log.info("认证服务器异常:{}", e.getMessage());
         }

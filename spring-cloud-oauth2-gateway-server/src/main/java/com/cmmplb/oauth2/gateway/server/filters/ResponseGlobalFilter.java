@@ -13,6 +13,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +26,7 @@ import reactor.core.publisher.Mono;
  */
 
 @Slf4j
-@Configuration
+@Component
 public class ResponseGlobalFilter implements GlobalFilter, Ordered {
 
     @Override

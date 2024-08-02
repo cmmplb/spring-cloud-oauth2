@@ -30,9 +30,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     private ResourceServerTokenServices resourceServerTokenServices;
 
     @Autowired
-    private TokenStore tokenStore;
-
-    @Autowired
     private AccessDeniedHandler accessDeniedHandler;
 
     @Autowired
@@ -41,9 +38,12 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Autowired
     private SecurityProperties securityProperties;
 
+    @Autowired
+    private TokenStore tokenStore;
+
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-        // token存取
+        // token存取验证, 如果使用了令牌服务ResourceServerTokenServices/RemoteTokenServices或者UserInfoTokenServices, 会向认证服务发起请求验证
         resources.tokenStore(tokenStore);
         // 校验token
         resources.tokenServices(resourceServerTokenServices);

@@ -26,6 +26,11 @@
             <groupId>com.cmmplb</groupId>
             <artifactId>spring-cloud-oauth2-resource-server</artifactId>
         </dependency>
+        <!-- 系统服务api模块 -->
+        <dependency>
+            <groupId>com.cmmplb</groupId>
+            <artifactId>spring-cloud-oauth2-system-server-api</artifactId>
+        </dependency>
         <!-- thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -60,4 +65,23 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.jks</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*.jks</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
 </project>

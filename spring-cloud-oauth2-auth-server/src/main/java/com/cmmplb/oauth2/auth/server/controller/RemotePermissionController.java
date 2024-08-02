@@ -1,7 +1,8 @@
-package com.cmmplb.oauth2.system.server.controller;
+package com.cmmplb.oauth2.auth.server.controller;
 
-import com.cmmplb.oauth2.resource.server.annotation.WithoutLogin;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.cmmplb.oauth2.resource.server.constants.SecurityConstant;
+import com.cmmplb.oauth2.system.server.api.client.PermissionFeignClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,43 +14,41 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("/permission")
-public class PermissionController {
+@RequestMapping("/remote/permission")
+public class RemotePermissionController {
+
+    @Autowired
+    private PermissionFeignClient permissionFeignClient;
 
     /**
      * 需要有write编码权限
      */
-    @PreAuthorize(value = "hasAuthority('write')")
     @GetMapping("/write")
     public String write() {
-        return "ok";
+        return permissionFeignClient.write();
     }
 
     /**
      * 需要有read编码权限
      */
-    @PreAuthorize(value = "hasAuthority('read')")
     @GetMapping("/read")
     public String read() {
-        return "ok";
+        return permissionFeignClient.read();
     }
 
     /**
      * 需要有普通用户角色权限
      */
-    @PreAuthorize(value = "hasRole('user')")
     @GetMapping("/user")
     public String user() {
-        return "ok";
+        return permissionFeignClient.user();
     }
 
     /**
      * 需要有管理员角色权限
      */
-    @WithoutLogin(true)
-    @PreAuthorize(value = "hasRole('admin')")
     @GetMapping("/admin")
     public String admin() {
-        return "ok";
+        return permissionFeignClient.admin(SecurityConstant.INNER);
     }
 }

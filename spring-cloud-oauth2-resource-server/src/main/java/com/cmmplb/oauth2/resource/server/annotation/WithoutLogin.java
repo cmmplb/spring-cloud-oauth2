@@ -1,5 +1,7 @@
 package com.cmmplb.oauth2.resource.server.annotation;
 
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 
 /**
@@ -15,4 +17,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface WithoutLogin {
 
+    /**
+     * 开启内部服务aop权限拦截
+     */
+    boolean value() default false;
 }

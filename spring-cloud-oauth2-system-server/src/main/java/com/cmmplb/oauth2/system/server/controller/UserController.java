@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since jdk 1.8
  */
 
+@WithoutLogin(true)
 @RestController
 @RequestMapping("/user")
 public class UserController {

@@ -1,18 +1,22 @@
 package com.cmmplb.oauth2.auth.server.configuration;
 
-import com.cmmplb.oauth2.resource.server.bean.User;
+import com.cmmplb.oauth2.resource.server.configuration.properties.Oauth2ConfigProperties;
 import com.cmmplb.oauth2.resource.server.handler.GlobalWebResponseExceptionTranslator;
-import com.cmmplb.oauth2.resource.server.impl.TokenEnhancerImpl;
+import com.cmmplb.oauth2.resource.server.impl.RedisAuthorizationCodeServicesImpl;
+import com.cmmplb.oauth2.resource.server.impl.RedisClientDetailsServiceImpl;
 import com.cmmplb.oauth2.resource.server.mobile.MobileTokenGranter;
-import com.cmmplb.oauth2.resource.server.impl.JdbcApprovalStoreImpl;
+import com.cmmplb.oauth2.resource.server.service.UserDetailsService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
+import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
+import org.springframework.security.oauth2.config.annotation.builders.InMemoryClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -22,18 +26,20 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.approval.InMemoryApprovalStore;
+import org.springframework.security.oauth2.provider.approval.JdbcApprovalStore;
+import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
+import org.springframework.security.oauth2.provider.client.BaseClientDetails;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
-import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
-import org.springframework.security.oauth2.provider.token.TokenEnhancer;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.*;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author penglibo
@@ -42,8 +48,10 @@ import java.util.Map;
  * oauth2授权服务器配置
  */
 
+@Slf4j
 @Configuration
 @EnableAuthorizationServer
+@EnableConfigurationProperties(Oauth2ConfigProperties.class)
 public class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
@@ -53,10 +61,16 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private DataSource dataSource;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private TokenEnhancer tokenEnhancer;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired(required = false)
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private AccessTokenConverter accessTokenConverter;
 
     @Autowired
     private ClientDetailsService clientDetailsService;
@@ -65,8 +79,16 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private GlobalWebResponseExceptionTranslator globalWebResponseExceptionTranslator;
+    private Oauth2ConfigProperties oauth2ConfigProperties;
 
+    @Autowired
+    private RedisConnectionFactory redisConnectionFactory;
+
+    @Autowired(required = false)
+    private InMemoryUserDetailsManager inMemoryUserDetailsManager;
+
+    @Autowired
+    private GlobalWebResponseExceptionTranslator globalWebResponseExceptionTranslator;
 
     /**
      * 配置授权服务器端点的非安全功能，如令牌存储、令牌自定义、用户批准和授权类型。
@@ -79,17 +101,19 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 // 重复使用reuseRefreshToken
                 .reuseRefreshTokens(false)
                 // 用户信息服务
-                .userDetailsService(userDetailsService)
+                .userDetailsService(userDetailsService())
                 // 配置认证管理器
                 .authenticationManager(authenticationManager)
                 // 配置grant_type模式
                 .tokenGranter(tokenGranter(endpoints))
                 // 拓展token信息
-                .tokenEnhancer(tokenEnhancer())
+                .tokenEnhancer(tokenEnhancer)
                 // 配置token存储
                 .tokenStore(tokenStore)
                 // 认证服务器的token服务
                 .tokenServices(tokenServices())
+                // 配置token转换器
+                .accessTokenConverter(accessTokenConverter)
                 // 配置授权存储
                 .approvalStore(approvalStore())
                 // 配置授权码存储
@@ -112,7 +136,10 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
                 // 允许客户端表单验证，默认false
                 .allowFormAuthenticationForClients()
                 // 允许校验token请求，默认denyAll()
-                .checkTokenAccess("permitAll()");
+                .checkTokenAccess("permitAll()")
+                // 允许获取公钥请求，默认denyAll()
+                .tokenKeyAccess("isAuthenticated()")
+        ;
     }
 
     /**
@@ -122,14 +149,42 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        // 基于数据库配置
-        jdbc(clients);
-        // 基于内存配置
-        // inMemory(clients);
+        if (oauth2ConfigProperties.getClientDetailsServiceType().equals(Oauth2ConfigProperties.ClientDetailsServiceType.JDBC)) {
+            clients.jdbc(dataSource);
+        } else if (oauth2ConfigProperties.getClientDetailsServiceType().equals(Oauth2ConfigProperties.ClientDetailsServiceType.REDIS)) {
+            clients.withClientDetails(new RedisClientDetailsServiceImpl(dataSource));
+        } else {
+            InMemoryClientDetailsServiceBuilder serviceBuilder = clients.inMemory();
+            for (BaseClientDetails client : oauth2ConfigProperties.getClients()) {
+                ClientDetailsServiceBuilder<InMemoryClientDetailsServiceBuilder>.ClientBuilder clientBuilder =
+                        serviceBuilder.withClient(client.getClientId());
+                clientBuilder.secret(passwordEncoder.encode(client.getClientSecret()));
+                if (!CollectionUtils.isEmpty(client.getAutoApproveScopes())) {
+                    clientBuilder.autoApprove(client.getAutoApproveScopes().toArray(new String[0]));
+                }
+                if (!CollectionUtils.isEmpty(client.getScope())) {
+                    clientBuilder.scopes(client.getScope().toArray(new String[0]));
+                }
+                if (!CollectionUtils.isEmpty(client.getRegisteredRedirectUri())) {
+                    clientBuilder.redirectUris(client.getRegisteredRedirectUri().toArray(new String[0]));
+                }
+                if (!CollectionUtils.isEmpty(client.getAuthorizedGrantTypes())) {
+                    clientBuilder.authorizedGrantTypes(client.getAuthorizedGrantTypes().toArray(new String[0]));
+                }
+                if (null != client.getAccessTokenValiditySeconds()) {
+                    clientBuilder.accessTokenValiditySeconds(client.getAccessTokenValiditySeconds());
+                }
+                if (null != client.getRefreshTokenValiditySeconds()) {
+                    clientBuilder.refreshTokenValiditySeconds(client.getRefreshTokenValiditySeconds());
+                }
+            }
+        }
     }
 
     /**
      * 认证服务器的token服务，使用@Primary覆盖ResourceServerTokenServices
+     * 不定义这个bean的话，当携带token请求认证服务，会经过ResourceServerTokenServices调用checkToken或者userInfo方法重复调用，
+     * 本身就是auth获取自身的资源，不需要再调用checkToken接口验证了，直接使用DefaultTokenServices通过tokenStore验签
      */
     @Bean
     @Primary
@@ -138,35 +193,9 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
         tokenServices.setTokenStore(tokenStore);
         tokenServices.setSupportRefreshToken(true);
         tokenServices.setReuseRefreshToken(true);
-        tokenServices.setTokenEnhancer(tokenEnhancer());
+        tokenServices.setTokenEnhancer(tokenEnhancer);
         tokenServices.setClientDetailsService(clientDetailsService);
         return tokenServices;
-    }
-
-    /**
-     * 基于数据库配置客户端信息
-     */
-    private void jdbc(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.jdbc(dataSource);
-    }
-
-    /**
-     * 基于内存配置客户端信息
-     */
-    private void inMemory(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients
-                // 基于内存配置
-                .inMemory()
-                // 客户端id
-                .withClient("web")
-                // 客户端密钥
-                .secret(passwordEncoder.encode("123456"))
-                // 自动同意，为false登录后会跳转到授权页面
-                .autoApprove(false)
-                .scopes("username", "phone", "age")
-                // 登录成功回调地址，这里如果配置了多个，则请求地址需要携带redirect_uri参数，并且值是配置的其中一个，如果只配置一个，则可以不带redirect_uri参数
-                .redirectUris("http://localhost:10000/auth/actuator/health", "http://localhost:20000/actuator/health", "http://localhost:18080/auth")
-                .authorizedGrantTypes("client_credentials", "password", "implicit", "authorization_code", "refresh_token");
     }
 
     /**
@@ -176,6 +205,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
      * @param endpoints 端点配置器
      * @return TokenGranter
      */
+    @SuppressWarnings("JavadocReference")
     private TokenGranter tokenGranter(AuthorizationServerEndpointsConfigurer endpoints) {
         // 在原有配置下添加手机号验证码模式
         TokenGranter tokenGranter = endpoints.getTokenGranter();
@@ -186,23 +216,43 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     }
 
     /**
-     * 拓展token信息
-     */
-    public TokenEnhancer tokenEnhancer() {
-        return new TokenEnhancerImpl();
-    }
-
-    /**
      * 基于数据库获取授权信息
      */
     public ApprovalStore approvalStore() {
-        return new JdbcApprovalStoreImpl(dataSource);
+        ApprovalStore approvalStore;
+        if (oauth2ConfigProperties.getApprovalStoreType().equals(Oauth2ConfigProperties.ApprovalStoreType.JDBC)) {
+            approvalStore = new JdbcApprovalStore(dataSource);
+        } else if (oauth2ConfigProperties.getApprovalStoreType().equals(Oauth2ConfigProperties.ApprovalStoreType.Token)) {
+            approvalStore = new TokenApprovalStore();
+        } else {
+            approvalStore = new InMemoryApprovalStore();
+        }
+        return approvalStore;
     }
 
     /**
-     * 基于数据库存储授权码信息
+     * 授权码信息
      */
     public AuthorizationCodeServices authorizationCodeServices() {
-        return new JdbcAuthorizationCodeServices(dataSource);
+        AuthorizationCodeServices authorizationCodeServices;
+        if (oauth2ConfigProperties.getAuthorizationCodeServicesType().equals(Oauth2ConfigProperties.AuthorizationCodeServicesType.JDBC)) {
+            authorizationCodeServices = new JdbcAuthorizationCodeServices(dataSource);
+        } else if (oauth2ConfigProperties.getAuthorizationCodeServicesType().equals(Oauth2ConfigProperties.AuthorizationCodeServicesType.REDIS)) {
+            authorizationCodeServices = new RedisAuthorizationCodeServicesImpl(redisConnectionFactory);
+        } else {
+            authorizationCodeServices = new InMemoryAuthorizationCodeServices();
+        }
+        return authorizationCodeServices;
+    }
+
+    /**
+     * 用户信息
+     */
+    public org.springframework.security.core.userdetails.UserDetailsService userDetailsService() {
+        if (oauth2ConfigProperties.getUserDetailsServiceType().equals(Oauth2ConfigProperties.UserDetailsServiceType.JDBC)) {
+            return userDetailsService;
+        } else {
+            return inMemoryUserDetailsManager;
+        }
     }
 }

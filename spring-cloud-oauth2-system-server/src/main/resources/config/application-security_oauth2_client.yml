@@ -1,0 +1,7 @@
+security:
+  oauth2:
+    client:
+      # 客户端id
+      client-id: system-server
+      # 客户端密钥, 注意数据库存储的时候需要加密
+      client-secret: 123456

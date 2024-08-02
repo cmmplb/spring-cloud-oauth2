@@ -17,7 +17,7 @@
     <!-- 描述信息 -->
     <description>spring-cloud-oauth2</description>
     <!-- 项目URL地址 -->
-    <url>https://gitee.com/cmmplb/spring-boot-starter</url>
+    <url>https://gitee.com/cmmplb/spring-cloud-oauth2</url>
 
     <!-- 子模块 -->
     <modules>
@@ -27,6 +27,7 @@
         <module>spring-cloud-oauth2-resource-server</module>
         <module>spring-cloud-oauth2-sso-server</module>
         <module>spring-cloud-oauth2-system-server</module>
+        <module>spring-cloud-oauth2-system-server-api</module>
     </modules>
 
     <!-- 版本依赖定义 -->
@@ -96,6 +97,12 @@
                 <groupId>com.cmmplb</groupId>
                 <artifactId>spring-cloud-oauth2-resource-server</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <!-- 系统服务api模块 -->
+            <dependency>
+                <groupId>com.cmmplb</groupId>
+                <artifactId>spring-cloud-oauth2-system-server-api</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <!-- fastjson -->
             <dependency>

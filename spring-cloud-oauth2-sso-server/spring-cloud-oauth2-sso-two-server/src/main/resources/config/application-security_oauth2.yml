@@ -19,3 +19,7 @@ security:
       prefer-token-info: false
       # 使用UserInfoTokenServices远程调用认证中心接口获取当前用户认证信息-OAuth2Authentication
       user-info-uri: http://localhost:@auth.server.port@/user/info
+      # 验证使用jwt时，需要注释上面两个url
+      jwt:
+        # 获取认证服务公钥的地址
+        key-uri: http://localhost:@gateway.server.port@/auth/oauth/token_key

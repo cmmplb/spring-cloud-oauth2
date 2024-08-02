@@ -17,3 +17,4 @@ spring:
       - logging
       - management
       - redis
+      - security_oauth2

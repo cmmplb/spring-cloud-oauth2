@@ -6,4 +6,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.cmmplb.oauth2.resource.server.handler.GlobalExceptionHandler,\
   com.cmmplb.oauth2.resource.server.handler.ResourceAuthenticationEntryPoint,\
   com.cmmplb.oauth2.resource.server.utils.SpringUtil,\
-  com.cmmplb.oauth2.resource.server.configuration.MethodSecurityEnabledConfiguration
+  com.cmmplb.oauth2.resource.server.configuration.MethodSecurityEnabledConfiguration,\
+  com.cmmplb.oauth2.resource.server.feign.FeignClientErrorDecoder,\
+  com.cmmplb.oauth2.resource.server.feign.FeignRequestInterceptor,\
+  com.cmmplb.oauth2.resource.server.aspect.SecurityInnerAspect

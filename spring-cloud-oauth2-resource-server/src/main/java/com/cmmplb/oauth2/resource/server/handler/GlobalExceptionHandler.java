@@ -48,7 +48,7 @@ public class GlobalExceptionHandler<T> implements ResponseBodyAdvice<T> {
     @ExceptionHandler({Exception.class})
     public Result<?> exceptionHandler(Exception e) {
 
-        log.error("error:", e);
+        log.info("error:{}", e.getMessage());
 
         // 处理业务异常
         if ((e instanceof BusinessException)) {

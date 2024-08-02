@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.cmmplb.oauth2.resource.server.bean.User;
 import com.cmmplb.oauth2.resource.server.bean.UserInfoVO;
+import com.cmmplb.oauth2.resource.server.constants.SecurityConstant;
 import com.cmmplb.oauth2.resource.server.handler.exception.BusinessException;
 import com.cmmplb.oauth2.resource.server.handler.exception.MobileNotFoundException;
 import com.cmmplb.oauth2.resource.server.result.HttpCodeEnum;
@@ -62,6 +63,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private Result<UserInfoVO> result(String url) {
         HttpHeaders headers = new HttpHeaders();
+        headers.add(SecurityConstant.SOURCE, SecurityConstant.INNER);
         if (headers.getContentType() == null) {
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         }

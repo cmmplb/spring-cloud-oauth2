@@ -1,17 +1,16 @@
 security:
   oauth2:
-    client:
-      # 客户端id
-      client-id: system-server
-      # 客户端密钥, 注意数据库存储的时候需要加密
-      client-secret: 123456
-    resource:
-      # 资源id
-      id: system-server
-      # token-info-uri和user-info-uri配置其中一个就行, 同时配置的话则看prefer-token-info
-      # 使用RemoteTokenServices远程调用认证中心接口校验token获取用户认证信息-OAuth2Authentication
-      token-info-uri: http://spring-cloud-oauth2-auth-server/oauth/check_token
-      # 使用token-info-uri模式, 默认为true
-      prefer-token-info: false
-      # 使用UserInfoTokenServices远程调用认证中心接口获取当前用户认证信息-OAuth2Authentication
-      user-info-uri: http://spring-cloud-oauth2-auth-server/user/info
+    # 是否使用DefaultTokenServices，用于测试客户端验证jwt
+    default-token-services: true
+    # 令牌存储类型: IN_MEMORY, JDBC, JWT, REDIS
+    tokenStoreType: JWT
+    # Jwt密钥配置
+#    jwt-key:
+#      # 客户端密钥配置
+#      client:
+#        # 是否对称加密, 默认为true
+#        symmetric: false
+#        # 对称加密签名密钥
+#        signing-key: cmmplb
+#        # 非对称加密公钥文件路径
+#        public-key-file-path: key/public.txt

@@ -20,3 +20,5 @@ spring:
       - rest_template
       - security
       - security_oauth2
+      - security_oauth2_client
+      - security_oauth2_resource
