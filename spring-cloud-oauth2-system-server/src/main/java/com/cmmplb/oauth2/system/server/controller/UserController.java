@@ -27,7 +27,7 @@ public class UserController {
 
     @GetMapping("/info/{username}")
     public Result<UserInfoVO> getByUsername(@PathVariable String username) {
-        return ResultUtil.success(userService.getByUsername(username));
+        return ResultUtil.success(userService.getByUsername(username.toLowerCase()));
     }
 
     @GetMapping("/info/mobile/{mobile}")

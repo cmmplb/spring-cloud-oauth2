@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerTokenServicesConfiguration;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
@@ -185,7 +186,8 @@ public class ResourceAutoConfiguration {
      * 参照源码手动设置密钥：{@link ResourceServerTokenServicesConfiguration.JwtTokenServicesConfiguration#jwtTokenEnhancer()}
      */
     @Bean
-    @ConditionalOnMissingBean(DefaultAccessTokenConverter.class)
+    // @ConditionalOnMissingBean(DefaultAccessTokenConverter.class)
+    @ConditionalOnProperty(prefix = "security.oauth2", name = "token-store-type", havingValue = "jwt")
     public JwtAccessTokenConverter jwtAccessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
         // 对称加密签名令牌，资源服务器也需要配置，用于验签，这里在application-security_oauth2_resource.yml配置文件中配置了

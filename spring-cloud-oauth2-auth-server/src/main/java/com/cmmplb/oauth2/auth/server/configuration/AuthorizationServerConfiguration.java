@@ -2,6 +2,7 @@ package com.cmmplb.oauth2.auth.server.configuration;
 
 import com.cmmplb.oauth2.resource.server.configuration.properties.Oauth2ConfigProperties;
 import com.cmmplb.oauth2.resource.server.handler.GlobalWebResponseExceptionTranslator;
+import com.cmmplb.oauth2.resource.server.impl.JdbcApprovalStoreImpl;
 import com.cmmplb.oauth2.resource.server.impl.RedisAuthorizationCodeServicesImpl;
 import com.cmmplb.oauth2.resource.server.impl.RedisClientDetailsServiceImpl;
 import com.cmmplb.oauth2.resource.server.mobile.MobileTokenGranter;
@@ -221,7 +222,7 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
     public ApprovalStore approvalStore() {
         ApprovalStore approvalStore;
         if (oauth2ConfigProperties.getApprovalStoreType().equals(Oauth2ConfigProperties.ApprovalStoreType.JDBC)) {
-            approvalStore = new JdbcApprovalStore(dataSource);
+            approvalStore = new JdbcApprovalStoreImpl(dataSource);
         } else if (oauth2ConfigProperties.getApprovalStoreType().equals(Oauth2ConfigProperties.ApprovalStoreType.Token)) {
             approvalStore = new TokenApprovalStore();
         } else {

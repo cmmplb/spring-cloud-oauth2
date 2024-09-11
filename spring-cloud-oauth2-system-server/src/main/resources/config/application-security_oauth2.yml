@@ -1,9 +1,9 @@
 security:
   oauth2:
     # 是否使用DefaultTokenServices，用于测试客户端验证jwt
-    default-token-services: true
+    default-token-services: false
     # 令牌存储类型: IN_MEMORY, JDBC, JWT, REDIS
-    tokenStoreType: JWT
+    tokenStoreType: REDIS
     # Jwt密钥配置
 #    jwt-key:
 #      # 客户端密钥配置

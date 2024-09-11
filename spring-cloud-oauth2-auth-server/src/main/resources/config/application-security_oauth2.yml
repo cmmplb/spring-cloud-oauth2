@@ -1,7 +1,7 @@
 security:
   oauth2:
     # 令牌存储类型: IN_MEMORY, JDBC, JWT, REDIS
-    tokenStoreType: JWT
+    tokenStoreType: REDIS
     # Jwt密钥配置
     jwt-key:
       # 是否为授权服务
